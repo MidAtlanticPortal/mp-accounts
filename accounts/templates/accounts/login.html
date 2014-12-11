@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="border: 1px solid blue; margin: 1em 20em; padding: 3em">
+    
+    <h1>Log in.</h1>
+    
+    <p>Anyone can join the MARCO Portal&emdash;becoming a member allows you 
+    to join and create interest groups, custom data layers, and share 
+    map views with your collaborators.</p>
+    
+    <div>
+    User: <input type="text" />
+    Password: <input type="password" />
+    </div>
+    
+    <p style='padding-left: 2em'>or log in with <br />
+        <a href='{% url 'social:begin' 'facebook' %}'><b>f</b>acebook</a> (not configured)<br />
+        <a href='{% url 'social:begin' 'twitter' %}'><b>t</b>witter</a> (not configured)<br />
+        <a href='{% url 'social:begin' 'google-oauth' %}'><b>g</b>oogle (oauth)</a>
+    </p>
+
+    <button>Log in &rarr;</button>
+    
+    
+    <p>I forgot my password &bullet; I need to register</p>
+
+</div>
+
+
+{% endblock %}

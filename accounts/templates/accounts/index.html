@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+Hello, {{ User }}. 
+
+Would you like to <a href="{% url 'account:logout' %}">log out?</a>
+
+
+{% endblock %}
