@@ -2,29 +2,151 @@
 
 {% block content %}
 
-<div style="border: 1px solid blue; margin: 1em 20em; padding: 3em">
+<script>
+var gplusButtonCreated = false;
+window.setTimeout(function() {
+    console.log("gplus button?", gplusButtonCreated)
+}, 5000);
+window.onbeforeunload = function() {
+    gapi.auth.signOut();
+}
+//** Create the button
+function gplusButton() {
+    gplusButtonCreated = true;
+    var b = document.getElementById('signinButton');
+    gapi.signin.render(b, {
+            clientid: '{{ GPLUS_ID }}',
+            scope: '{{ GPLUS_SCOPE }}',
+            cookiepolicy: 'single_host_origin', 
+            callback: 'googlePlusSignIn',
+            requestvisibleactions: 'http://schema.org/AddAction http://schema.org/CommentAction'
+        });
     
-    <h1>Log in.</h1>
+    // signinButton.addEventListener('click', function() {
+    //     gapi.auth.signIn({
+    //         clientid: '{{ GPLUS_ID }}',
+    //         scope: '{{ GPLUS_SCOPE }}',
+    //         cookiepolicy: 'single_host_origin',
+    //         callback: 'googlePlusSignIn',
+    //         requestvisibleactions: 'http://schema.org/AddAction http://schema.org/CommentAction'
+    //     });
+    // });
+}
+
+function googlePlusSignIn(authResult) {
+    console.log("G+ Auth result", authResult);
+
+    if (authResult['status']['method'] == 'AUTO') {
+        console.log("You were automatically logged in")
+    }
+    else if (authResult['status']['signed_in']) {
+        console.info("G+ Sign-In succeeded because", authResult.status.method);
+        document.getElementById('signinButton').setAttribute('style', 'display: none;');
+        document.getElementById('code').setAttribute('value', authResult['code']);
+        document.getElementById('at').setAttribute('value', authResult['access_token']);
+        document.getElementById('googlePlusSignInForm').submit()
+    }
+    else if (authResult['status']['google_logged_in']) {
+        console.log("You are logged in to google already, why don't you press the red button?")
+    }
+    else {
+        console.error("G+ Sign-In other error", authResult.error, 
+                      authResult.error_subtype);
+    }
+}
+
+</script>
+<script src="https://apis.google.com/js/client:platform.js?onload=gplusButton" async defer></script>
+
+<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
     
-    <p>Anyone can join the MARCO Portal&emdash;becoming a member allows you 
+    <h2 style="text-align: center;">Log in.</h2>
+    
+    <p>Anyone can join the MARCO Portal&mdash;<a href="#">becoming a member</a> allows you 
     to join and create interest groups, custom data layers, and share 
     map views with your collaborators.</p>
-    
+
     <div>
-    User: <input type="text" />
-    Password: <input type="password" />
+        <br />
+        <br />
+        <form class="login-form" method="POST" action="{% url 'account:login' %}">
+            <style>
+            .login-form {
+                margin-bottom: 1em;
+            }
+            .login-form > div {
+                width: 30em;
+                margin: 0 auto; 
+            }
+            .login-form div + div {
+                padding-top: 1ex;
+            }
+            .login-form .form-control {
+                color: black;
+            }
+            .login-form .left-inner-addon { position: relative; }
+            .login-form .left-inner-addon input { padding-left: 30px; }
+            .login-form .left-inner-addon i { 
+                position: absolute; padding: 10px 12px; cursor: default;
+            }
+            </style>
+                {% csrf_token %}
+                <div class="left-inner-addon">
+                    <i class="fa fa-user"></i>
+                    <input id="dj-username" type="text" class="form-control" 
+                           name="username" placeholder="user name" />
+                </div>
+
+                <div class="left-inner-addon">
+                    <i class="fa fa-unlock-alt"></i>
+                
+                    <input id="dj-password" name="password" type="password" 
+                           class="form-control" placeholder="password"
+                           style="line-height: 2em; border-left: none" />
+                </div>
+                
+                <div>
+                    <button onclick='this.form.submit()'>Log in &rarr;</button>
+                </div>
+                
+                <script>
+                function click_i() { console.log("you clicked", this); };
+                for (var element in document.querySelectorAll('.login-form i.fa')) {
+                    element.addEventListener('click', click_i);
+                }
+                </script>
+        </form>
+    </div>
+
+
+    <div style="position: relative;">
+        <div style="width:50%; margin:0">
+            <form id="googlePlusSignInForm" method="post" action="{% url 'social:complete' 'google-plus' %}?next={{ next }}">
+                {% csrf_token %}
+                <input id="at" type="hidden" name="access_token" value="" />
+                <input id="code" type="hidden" name="code" value="" />
+            </form>
+
+            <div id="signinButton"></div>
+        </div>
+        <div style="width:50%; position: absolute; top: 0; left:50%; margin: 0;">
+            <div id="fb-root"></div>
+            <script>(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=1007110619305644&version=v2.0";
+              fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+            <div class="fb-login-button" data-max-rows="1" data-size="large" 
+                 data-show-faces="false" data-auto-logout-link="false"></div>
+             <br />
+            <a href="{% url 'social:begin' 'facebook' %}?next={{ next }}"><b>F</b>acebook</a>
+        </div>
     </div>
     
-    <p style='padding-left: 2em'>or log in with <br />
-        <a href='{% url 'social:begin' 'facebook' %}'><b>f</b>acebook</a> (not configured)<br />
-        <a href='{% url 'social:begin' 'twitter' %}'><b>t</b>witter</a> (not configured)<br />
-        <a href='{% url 'social:begin' 'google-oauth' %}'><b>g</b>oogle (oauth)</a>
-    </p>
 
-    <button>Log in &rarr;</button>
-    
-    
-    <p>I forgot my password &bullet; I need to register</p>
+    <p style="text-align: center"><a href="">I forgot my password</a> &bull; <a href="">I need to register</a></p>
 
 </div>
 
