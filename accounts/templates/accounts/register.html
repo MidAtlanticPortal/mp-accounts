@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script>
+</script>
+
+<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
+    <h2 style="text-align: center;">Sign Up</h2>
+    <p style="text-align: center">(All fields are required)</p>
+    <div>
+        <form class="login-form" method="POST" action="{% url 'account:register' %}">
+            <style>
+            .login-form {
+                margin-bottom: 1em;
+            }
+            .login-form > div {
+                width: 30em;
+                margin: 0 auto; 
+            }
+            .login-form div + div {
+                padding-top: 1ex;
+            }
+            .login-form .form-control {
+                color: black;
+            }
+            .login-form .left-inner-addon { position: relative; }
+            .login-form .left-inner-addon input { padding-left: 30px; }
+            .login-form .left-inner-addon i { 
+                position: absolute; padding: 10px 12px; cursor: default;
+            }
+            </style>
+            {% csrf_token %}
+            
+            <hr />
+            {{ form.as_div }}
+            <hr />
+            
+            <div>
+                <button onclick='this.form.submit()'>Sign up &rarr;</button>
+            </div>
+            
+            <script>
+            function click_i() { console.log("you clicked", this); };
+            for (var element in document.querySelectorAll('.login-form i.fa')) {
+                element.addEventListener('click', click_i);
+            }
+            </script>
+        </form>
+    </div>
+
+    <p style="text-align: center"><a href="">I forgot my password</a></p>
+
+</div>
+
+
+{% endblock %}

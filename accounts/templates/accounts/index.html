@@ -28,31 +28,14 @@ Would you like to
 <button onclick='signOut()'>Log out?</button><br />
 
 username: {{ user.username }}<br/>
-groups: {% for g in user.groups.all %}{{ g.name }}{% empty %}Not a member of any groups{% endfor %}<br/>
-provider: {% for provider in user.social_auth.all %}{{ provider.provider }}{% endfor %}<br/>
+{# groups: {% for g in user.groups.all %}{{ g.name }}{% empty %}Not a member of any groups{% endfor %}<br/> #}
+{# provider: {% for provider in user.social_auth.all %}{{ provider.provider }}{% endfor %}<br/> #}
 name: {{ user.first_name }} {{ user.last_name }}<br/>
 email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }}<br/>
-is_active: {{ user.is_active }}<br/>
-   is_super: {{ user.is_superuser }}<br/>
-   is_staff: {{ user.is_staff }}<br/>
- last_login: {{ user.last_login }}<br/>
-date_joined: {{ user.date_joined }}<br/>
-<br />
-login method: <span id="how-loggedin"></span>
-
-<script>
-var s = window.location.search.slice(1).split('&');
-var params = {};
-
-for (var p in s) {
-    var kv = s[p].split('=');
-    params[kv[0]] = kv[1];
-    console.log(kv[0], kv[1])
-}
-
-if (params['login']) {
-    document.getElementById('how-loggedin').innerText = params['login'];
-}
-</script>
+{# is_active: {{ user.is_active }}<br/> #}
+{#    is_super: {{ user.is_superuser }}<br/> #}
+{#    is_staff: {{ user.is_staff }}<br/> #}
+{#  last_login: {{ user.last_login }}<br/> #}
+{# date_joined: {{ user.date_joined }}<br/> #}
 
 {% endblock %}

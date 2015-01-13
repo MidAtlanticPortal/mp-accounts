@@ -20,17 +20,7 @@ function gplusButton() {
             cookiepolicy: 'single_host_origin', 
             callback: 'googlePlusSignIn',
             requestvisibleactions: 'http://schema.org/AddAction http://schema.org/CommentAction'
-        });
-    
-    // signinButton.addEventListener('click', function() {
-    //     gapi.auth.signIn({
-    //         clientid: '{{ GPLUS_ID }}',
-    //         scope: '{{ GPLUS_SCOPE }}',
-    //         cookiepolicy: 'single_host_origin',
-    //         callback: 'googlePlusSignIn',
-    //         requestvisibleactions: 'http://schema.org/AddAction http://schema.org/CommentAction'
-    //     });
-    // });
+    });
 }
 
 function googlePlusSignIn(authResult) {
@@ -47,7 +37,7 @@ function googlePlusSignIn(authResult) {
         document.getElementById('googlePlusSignInForm').submit()
     }
     else if (authResult['status']['google_logged_in']) {
-        console.log("You are logged in to google already, why don't you press the red button?")
+        console.log("You are logged in to google already.")
     }
     else {
         console.error("G+ Sign-In other error", authResult.error, 
@@ -62,7 +52,7 @@ function googlePlusSignIn(authResult) {
     
     <h2 style="text-align: center;">Log in.</h2>
     
-    <p>Anyone can join the MARCO Portal&mdash;<a href="#">becoming a member</a> allows you 
+    <p>Anyone can join the MARCO Portal&mdash;<a href="{% url 'account:register' %}">becoming a member</a> allows you 
     to join and create interest groups, custom data layers, and share 
     map views with your collaborators.</p>
 
@@ -146,7 +136,7 @@ function googlePlusSignIn(authResult) {
     </div>
     
 
-    <p style="text-align: center"><a href="">I forgot my password</a> &bull; <a href="">I need to register</a></p>
+    <p style="text-align: center"><a href="console.debug('forgot password link')">I forgot my password</a> &bull; <a href="{% url 'account:register' %}">I need to register</a></p>
 
 </div>
 
