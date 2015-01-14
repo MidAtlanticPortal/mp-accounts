@@ -1,8 +1,8 @@
-Dear {name},
+Dear {{ name }},
 
 Please copy and paste this url into your browser to validate your email address.
 
-    {url}
+    {{ url }}
 
 If you did not request this, then no action is required.
 

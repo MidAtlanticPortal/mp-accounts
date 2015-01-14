@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from forms import SignUpForm
 import uuid
 from django.template.loader import get_template
+from django.template.context import Context
 
 
 def index(request):
@@ -113,7 +114,7 @@ def send_verification_email(request, user, code):
     url = request.build_absolute_uri(reverse('account:verify_email', 
                                              args=(code,)))
     
-    context = {'name': user.first_name, 'url': url}
+    context = Context({'name': user.first_name, 'url': url})
     template = get_template('accounts/mail/verify_email.txt')
     body_txt = template.render(context)
     template = get_template('accounts/mail/verify_email.html')
