@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from forms import SignUpForm
 import uuid
+from django.template.loader import get_template
 
 
 def index(request):
@@ -106,38 +107,19 @@ def register(request):
 
 
 def send_verification_email(request, user, code):
-    link = request.build_absolute_uri(reverse('account:verify_email', 
-                                              args=(code,)))
-    # TODO: Move this to template
-    body = '''
-    Hi, someone gave this email address while signing up for an account on 
-    http://midatlanticocean.org. If it wasn't you, then please discard this email. 
+    """Send a verification link to the specified user.
+    """
     
-    Otherwise, click on this link to validate your email address and complete
-    the sign in process:
+    url = request.build_absolute_uri(reverse('account:verify_email', 
+                                             args=(code,)))
     
-        %s
-    
-    Regards, 
-    
-    The MARCO Portal Team
-    ''' % link
-    
-    html = """<p>Hi, someone gave this email address while signing up for an 
-    account on <a href="http://midatlanticocean.org>midatlanticocean.org</a>. 
-    If it wasn't you, then please discard this email.</p>
-
-    <p>Otherwise, click on this link to verify your email address and complete
-    the sign-in process: </p>
-    
-    <p><a href="{link}">{link}</a></p>
-    
-    <p>Regards, <br/>
-    <br/>
-    The MARCO Portal Team</p>""".format(link=link)
-    
-    user.email_user('Please verify your email address', body, 
-                    html_message=html, fail_silently=False)
+    context = {'name': user.first_name, 'url': url}
+    template = get_template('accounts/mail/verify_email.txt')
+    body_txt = template.render(context)
+    template = get_template('accounts/mail/verify_email.html')
+    body_html = template.render(context)
+    user.email_user('Please verify your email address', body_txt, 
+                    html_message=body_html, fail_silently=False)
 
 
 def verify_email(request, code):

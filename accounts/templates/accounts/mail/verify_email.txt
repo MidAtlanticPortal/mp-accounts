@@ -1,0 +1,13 @@
+Dear {name},
+
+Please copy and paste this url into your browser to validate your email address.
+
+    {url}
+
+If you did not request this, then no action is required.
+
+Regards, 
+
+MARCO Portal Team
+info@ < marco portal web site >
+http://midatlanticoceans.org
