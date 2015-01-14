@@ -1,2 +1,4 @@
 *.pyc
 mp_accounts.egg-info
+build
+dist

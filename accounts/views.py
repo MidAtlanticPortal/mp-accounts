@@ -1,9 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from social.backends.google import GooglePlusAuth
 from django.contrib.sessions.models import Session
-import datetime
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
@@ -11,10 +8,12 @@ from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from forms import SignUpForm
 import uuid
+from django.template.loader import get_template
+from django.template.context import Context
 
 
 def index(request):
-    """Serve up the primary account view, or the login view.
+    """Serve up the primary account view, or the login view if not logged in
     """
     if request.user.is_anonymous():
         return login_page(request)
@@ -27,8 +26,9 @@ def index(request):
 
     return render(request, 'accounts/index.html', c)
 
+
 def login_page(request):
-    """Serve up the primary account view, or the login view.
+    """The login view. Served from index()
     """
     next_page = request.GET.get('next', '/')
     c = {}
@@ -43,16 +43,16 @@ def login_page(request):
                 login(request, user)
                 return HttpResponseRedirect(next_page)
             else:
-                # TODO: Make this a view / inactive user
                 return HttpResponse("Access Denied", status=403)
         else:
-            return HttpResponseRedirect(reverse('account:invalid_credentials'))
+            return render(request, 'accounts/invalid_credentials.html')
 
     c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY, 
              GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
              next=next_page)
     
     return render(request, 'accounts/login.html', c)
+
 
 def register(request):
     """Show the registration page.
@@ -71,12 +71,10 @@ def register(request):
             email = form.cleaned_data['email']
             user, created = User.objects.get_or_create(username=username)
             if not created: 
-                # TODO: Put this in a view function
-                return HttpResponse("Your user didn't get created", 
-                                    content_type="text/plain")
+                # This may happen if the form is submitted outside the normal
+                # login flow with a user that already exists
+                return render(request, 'accounts/registration_error.html')
 
-            validation_code = uuid.uuid4().hex
-            
             user.is_active = False  # not validated yet
             user.password = password
             user.first_name = first_name
@@ -84,21 +82,10 @@ def register(request):
             user.email = email
             
             user.save()
+
+            verify_email_address(request, user)
             
-            # TODO: Store this with the user itself
-            # This is a temporary hack to get around having to create a new 
-            # user model right now. The problem with this is that the code is 
-            # stored in the current session, so use must the same browser 
-            # session to validate your email address. In most cases that's 
-            # probably fine, but in many cases it won't work. 
-             
-            request.session['verification_code'] = validation_code
-            request.session['user_id'] = user.id
-            
-            send_verification_email(request, user, validation_code)
-            
-            return HttpResponseRedirect(reverse('account:check_your_email'),
-                                        content_type="text/plain")
+            return render(request, 'accounts/check_your_email.html')
     else:
         form = SignUpForm()
 
@@ -107,39 +94,41 @@ def register(request):
     }
     return render(request, 'accounts/register.html', c)    
 
-def send_verification_email(request, user, code):
-    link = request.build_absolute_uri(reverse('account:verify_email', 
-                                              args=(code,)))
-    # TODO: Move this to template
-    body = '''
-    Hi, someone gave this email address while signing up for an account on 
-    http://midatlanticocean.org. If it wasn't you, then please discard this email. 
-    
-    Otherwise, click on this link to validate your email address and complete
-    the sign in process:
-    
-        %s
-    
-    Regards, 
-    
-    The MARCO Portal Team
-    ''' % link
-    
-    html = """<p>Hi, someone gave this email address while signing up for an 
-    account on <a href="http://midatlanticocean.org>midatlanticocean.org</a>. 
-    If it wasn't you, then please discard this email.</p>
 
-    <p>Otherwise, click on this link to verify your email address and complete
-    the sign-in process: </p>
+def verify_email_address(request, user):
+    """Verify a user's email address. Typically during registration or when 
+    an email address is changed. 
+    """
+
+    # TODO: Store this with the user itself
+    # This is a temporary hack to get around having to create a new 
+    # user model right now. The problem with this is that the code is 
+    # stored in the current session, so use must the same browser 
+    # session to validate your email address. In most cases that's 
+    # probably fine, but in many cases it won't work. 
     
-    <p><a href="{link}">{link}</a></p>
+    verification_code = uuid.uuid4().hex
+
+    request.session['verification_code'] = verification_code
+    request.session['user_id'] = user.id
     
-    <p>Regards, <br/>
-    <br/>
-    The MARCO Portal Team</p>""".format(link=link)
+    send_verification_email(request, user, verification_code)
+
+
+def send_verification_email(request, user, code):
+    """Send a verification link to the specified user.
+    """
     
-    user.email_user('Please verify your email address', body, 
-                    html_message=html, fail_silently=False)
+    url = request.build_absolute_uri(reverse('account:verify_email', 
+                                             args=(code,)))
+    
+    context = Context({'name': user.first_name, 'url': url})
+    template = get_template('accounts/mail/verify_email.txt')
+    body_txt = template.render(context)
+    template = get_template('accounts/mail/verify_email.html')
+    body_html = template.render(context)
+    user.email_user('Please verify your email address', body_txt, 
+                    html_message=body_html, fail_silently=False)
 
 
 def verify_email(request, code):
@@ -154,33 +143,16 @@ def verify_email(request, code):
     
     del request.session['verification_code']
     del request.session['user_id']
-    
-    print "        code is", code
-    print "session_code is", session_code
-    print "user id is", user_id
-    print "request user is", request.user
 
     if code == session_code: 
         user = get_object_or_404(User, id=user_id)
         user.is_active = True
         user.save()
-        # TODO: View
-        return HttpResponse('''Your email has been successfully verified.\n
-You may now [log in] ''' + request.build_absolute_uri(reverse('account:index')),
-                            content_type='text/plain')
+        return render(request, 'accounts/verify_email_success.html')
+
     else: 
         raise Http404()
-   
-    
-def check_your_email(request):
-    # TODO: View
-    return HttpResponse("Check your email for a verification link to continue", 
-                        content_type='text/plain')
 
-def invalid_credentials(request):
-    # TODO: View
-    return HttpResponse("The user name and password do not match.", 
-                        content_type='text/plain')
 
 def all_logged_in_users():
     sessions = Session.objects.filter(expire_date__gte=timezone.now())
