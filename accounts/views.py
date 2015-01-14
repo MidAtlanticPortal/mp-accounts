@@ -164,20 +164,21 @@ def verify_email(request, code):
         user = get_object_or_404(User, id=user_id)
         user.is_active = True
         user.save()
-        
+        # TODO: View
         return HttpResponse('''Your email has been successfully verified.\n
 You may now [log in] ''' + request.build_absolute_uri(reverse('account:index')),
                             content_type='text/plain')
-  
     else: 
         raise Http404()
    
     
 def check_your_email(request):
+    # TODO: View
     return HttpResponse("Check your email for a verification link to continue", 
                         content_type='text/plain')
 
 def invalid_credentials(request):
+    # TODO: View
     return HttpResponse("The user name and password do not match.", 
                         content_type='text/plain')
 
