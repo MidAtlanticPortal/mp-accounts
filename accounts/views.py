@@ -43,10 +43,9 @@ def login_page(request):
                 login(request, user)
                 return HttpResponseRedirect(next_page)
             else:
-                # TODO: Make this a view / inactive user
                 return HttpResponse("Access Denied", status=403)
         else:
-            return HttpResponseRedirect(reverse('account:invalid_credentials'))
+            return render(request, 'accounts/invalid_credentials.html')
 
     c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY, 
              GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
@@ -72,8 +71,7 @@ def register(request):
             user, created = User.objects.get_or_create(username=username)
             if not created: 
                 # TODO: Put this in a view function
-                return HttpResponse("Your user didn't get created", 
-                                    content_type="text/plain")
+                return render(request, 'accounts/registration_error.html')
 
             validation_code = uuid.uuid4().hex
             
@@ -97,8 +95,7 @@ def register(request):
             
             send_verification_email(request, user, validation_code)
             
-            return HttpResponseRedirect(reverse('account:check_your_email'),
-                                        content_type="text/plain")
+            return render(request, 'accounts/check_your_email.html')
     else:
         form = SignUpForm()
 
@@ -106,6 +103,7 @@ def register(request):
         'form': form,
     }
     return render(request, 'accounts/register.html', c)    
+
 
 def send_verification_email(request, user, code):
     link = request.build_absolute_uri(reverse('account:verify_email', 
@@ -164,23 +162,11 @@ def verify_email(request, code):
         user = get_object_or_404(User, id=user_id)
         user.is_active = True
         user.save()
-        # TODO: View
-        return HttpResponse('''Your email has been successfully verified.\n
-You may now [log in] ''' + request.build_absolute_uri(reverse('account:index')),
-                            content_type='text/plain')
+
+        return render(request, 'accounts/verify_email_success.html')
     else: 
         raise Http404()
-   
-    
-def check_your_email(request):
-    # TODO: View
-    return HttpResponse("Check your email for a verification link to continue", 
-                        content_type='text/plain')
 
-def invalid_credentials(request):
-    # TODO: View
-    return HttpResponse("The user name and password do not match.", 
-                        content_type='text/plain')
 
 def all_logged_in_users():
     sessions = Session.objects.filter(expire_date__gte=timezone.now())

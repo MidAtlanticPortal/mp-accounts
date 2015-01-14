@@ -7,12 +7,8 @@ urlpatterns = patterns('',
     url('^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, 
         name='logout'), 
     url('^register/$', 'accounts.views.register', name='register'),
-    url('^check-your-email/$', 'accounts.views.check_your_email', 
-        name='check_your_email'),
     url('^verify/(?P<code>[a-f0-9]{32})$', 'accounts.views.verify_email', 
         name='verify_email'),
-    url('^invalid/$', 'accounts.views.invalid_credentials', 
-        name='invalid_credentials'),
 )
 
 
