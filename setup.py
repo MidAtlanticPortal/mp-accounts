@@ -10,6 +10,7 @@ setup(
     name='mp-accounts',
     version='0.0.1',
     packages=['accounts'],
+    install_requires=['python-social-auth'],
     include_package_data=True,
     license='TBD',
     description='Account Management',
