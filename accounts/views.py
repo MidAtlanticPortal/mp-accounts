@@ -149,8 +149,11 @@ def verify_email(request, code):
     session_code = request.session.get('verification_code', None)
     user_id = request.session.get('user_id', None)
     
+    if session_code is None or user_id is None: 
+        raise Http404()
+    
     del request.session['verification_code']
-    del request.session['user.id']
+    del request.session['user_id']
     
     print "        code is", code
     print "session_code is", session_code
@@ -161,12 +164,13 @@ def verify_email(request, code):
         user = get_object_or_404(User, id=user_id)
         user.is_active = True
         user.save()
-
         
-        return HttpResponseRedirect
-    
+        return HttpResponse('''Your email has been successfully verified.\n
+You may now [log in] ''' + request.build_absolute_uri(reverse('account:index')),
+                            content_type='text/plain')
+  
     else: 
-        return Http404()
+        raise Http404()
    
     
 def check_your_email(request):
