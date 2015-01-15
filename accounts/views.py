@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.contrib.sessions.models import Session
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from models import EmailVerification, Detail
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
@@ -21,7 +22,7 @@ def index(request):
     c = {}
 
     if settings.DEBUG:
-        c['users'] = User.objects.all()
+        c['users'] = get_user_model().objects.all()
         c['sessions'] = all_logged_in_users()
 
     return render(request, 'accounts/index.html', c)
@@ -69,20 +70,21 @@ def register(request):
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             email = form.cleaned_data['email']
-            user, created = User.objects.get_or_create(username=username)
+            user, created = get_user_model().objects.get_or_create(username=username)
             if not created: 
                 # This may happen if the form is submitted outside the normal
                 # login flow with a user that already exists
                 return render(request, 'accounts/registration_error.html')
 
             user.is_active = False  # not validated yet
-            user.password = password
+            user.set_password(password)
             user.first_name = first_name
             user.last_name = last_name
             user.email = email
-            
+           
             user.save()
-
+            user.detail = Detail.objects.create(user=user)
+            
             verify_email_address(request, user)
             
             return render(request, 'accounts/check_your_email.html')
@@ -95,7 +97,7 @@ def register(request):
     return render(request, 'accounts/register.html', c)    
 
 
-def verify_email_address(request, user):
+def verify_email_address(request, user, activate_user=True):
     """Verify a user's email address. Typically during registration or when 
     an email address is changed. 
     """
@@ -107,47 +109,42 @@ def verify_email_address(request, user):
     # session to validate your email address. In most cases that's 
     # probably fine, but in many cases it won't work. 
     
-    verification_code = uuid.uuid4().hex
+    e = EmailVerification()
+    e.user = user
+    e.email_to_verify = user.email
+    e.activate_user = activate_user
+    e.save()
+    send_verification_email(request, e)
 
-    request.session['verification_code'] = verification_code
-    request.session['user_id'] = user.id
-    
-    send_verification_email(request, user, verification_code)
 
-
-def send_verification_email(request, user, code):
+def send_verification_email(request, e):
     """Send a verification link to the specified user.
     """
     
     url = request.build_absolute_uri(reverse('account:verify_email', 
-                                             args=(code,)))
+                                             args=(e.verification_code,)))
     
-    context = Context({'name': user.first_name, 'url': url})
+    context = Context({'name': e.user.get_short_name(), 'url': url})
     template = get_template('accounts/mail/verify_email.txt')
     body_txt = template.render(context)
     template = get_template('accounts/mail/verify_email.html')
     body_html = template.render(context)
-    user.email_user('Please verify your email address', body_txt, 
-                    html_message=body_html, fail_silently=False)
+    e.user.email_user('Please verify your email address', body_txt, 
+                      html_message=body_html, fail_silently=False)
 
 
 def verify_email(request, code):
     """Check for an email verification code in the querystring
     """
 
-    session_code = request.session.get('verification_code', None)
-    user_id = request.session.get('user_id', None)
-    
-    if session_code is None or user_id is None: 
-        raise Http404()
-    
-    del request.session['verification_code']
-    del request.session['user_id']
+    # Is the code in the database? 
+    e = get_object_or_404(EmailVerification, verification_code=code)
 
-    if code == session_code: 
-        user = get_object_or_404(User, id=user_id)
-        user.is_active = True
-        user.save()
+    if e.activate_user: 
+        e.user.is_active = True
+        e.user.properties.email_verified = True
+        e.user.save()
+        e.delete()
         return render(request, 'accounts/verify_email_success.html')
 
     else: 
@@ -160,7 +157,7 @@ def all_logged_in_users():
     for session in sessions:
         uid = session.get_decoded().get('_auth_user_id', None)
         if uid: 
-            user_obj = User.objects.filter(id=uid)
+            user_obj = get_user_model().objects.filter(id=uid)
             if user_obj:
                 users.append({'user': user_obj[0], 'until': session.expire_date})
     
