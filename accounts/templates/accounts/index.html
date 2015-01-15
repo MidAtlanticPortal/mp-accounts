@@ -24,6 +24,10 @@ function signOut()
     location.href = "{% url 'account:logout' %}";
 }
 </script>
+
+<div style="width: 64px; height: 64px; overflow: hidden; border: 1px solid #999; background-color: rgba(0, 0, 0, 0.125)">
+<img width=64 height=64 src="{{ user.userdata.profile_image }}" />
+</div>
 Would you like to
 <button onclick='signOut()'>Log out?</button><br />
 

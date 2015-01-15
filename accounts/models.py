@@ -2,6 +2,7 @@ from django.db import models
 # User = get_user_model()
 from django.contrib.auth.models import User
 import uuid
+from django.templatetags.static import static
 
 class EmailVerification(models.Model):
     """Model to store email address verification data. 
@@ -26,6 +27,7 @@ class UserData(models.Model):
     email_verified = models.BooleanField(default=False, 
                                          help_text=("Has this user's email " 
                                                     "been verified?"))
-#     avatar = models.URLField()
+    profile_image = models.URLField(default=static('accounts/marco_user.png'),
+                                    help_text=("URL to the user's profile image."))
     
     
