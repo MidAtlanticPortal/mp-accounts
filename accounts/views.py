@@ -83,7 +83,7 @@ def register(request):
             user.email = email
            
             user.save()
-            user.detail = Detail.objects.create(user=user)
+            user.detail = UserData.objects.create(user=user)
             
             verify_email_address(request, user)
             
