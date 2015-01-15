@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
-from models import EmailVerification, Detail
+from models import EmailVerification, UserData
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
@@ -83,7 +83,7 @@ def register(request):
             user.email = email
            
             user.save()
-            user.detail = Detail.objects.create(user=user)
+            user.detail = UserData.objects.create(user=user)
             
             verify_email_address(request, user)
             

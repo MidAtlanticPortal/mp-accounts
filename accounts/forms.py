@@ -1,7 +1,7 @@
 from django import forms
 from widgets import BSLeftIconTextInput, BSLeftIconPasswordInput,\
     BSLeftIconEmailInput
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model 
 
 def l_icon(icon_class, placeholder=None, attrs=None):
     """Shortcut for a left icon text input
@@ -62,10 +62,10 @@ class SignUpForm(DivForm):
         username = cleaned_data.get('username')
         email = cleaned_data.get('email')
         
-        if User.objects.filter(username=username).exists(): 
+        if get_user_model().objects.filter(username=username).exists(): 
             msg = u"This user name is already in use, please select another."
             self.add_error("username", msg)
-        if User.objects.filter(email=email).exists():
+        if get_user_model().objects.filter(email=email).exists():
             msg = u"This email address is already in use, please select another"
             self.add_error("email", msg)
 
