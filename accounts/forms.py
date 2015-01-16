@@ -86,3 +86,8 @@ class LogInForm(DivForm):
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon('fa fa-unlock-alt', 'password'))
     
+
+class SocialAccountConfirmEmailForm(DivForm):
+    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
+    
+    

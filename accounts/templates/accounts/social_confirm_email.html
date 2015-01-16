@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script>
+</script>
+
+<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
+    <h2 style="text-align: center;">Please enter your email address</h2>
+    <div>
+        Hi, backend is {{ backend }}
+        <form class="login-form" method="POST" action="{% url 'account:social_confirm_email' %}">
+            <style>
+            .login-form {
+                margin-bottom: 1em;
+            }
+            .login-form > div {
+                width: 30em;
+                margin: 0 auto; 
+            }
+            .login-form div + div {
+                padding-top: 1ex;
+            }
+            .login-form .form-control {
+                color: black;
+            }
+            .login-form .left-inner-addon { position: relative; }
+            .login-form .left-inner-addon input { padding-left: 30px; }
+            .login-form .left-inner-addon i { 
+                position: absolute; padding: 10px 12px; cursor: default;
+            }
+            </style>
+            {% csrf_token %}
+            
+            <hr />
+            {{ form.as_div }}
+            <hr />
+        </form>
+            
+        <div>
+            <button onclick='this.form.submit()'>Finish &rarr;</button>
+            
+            <button onclick='window.location.href="/"'>I changed my mind</button>
+            <button onclick='window.location.href="{% url 'social:disconnect' backend %}"'>I changed my mind</button>
+            </form>
+        </div>
+            
+    </div>
+
+</div>
+
+
+{% endblock %}
