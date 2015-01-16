@@ -31,6 +31,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('user', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
                 ('email_verified', models.BooleanField(default=False, help_text=b"Has this user's email been verified?")),
+                ('profile_image', models.URLField(default=b'/static/accounts/marco_user.png', help_text=b"URL to the user's profile image.")),
             ],
             options={
             },

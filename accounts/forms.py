@@ -2,6 +2,8 @@ from django import forms
 from widgets import BSLeftIconTextInput, BSLeftIconPasswordInput,\
     BSLeftIconEmailInput
 from django.contrib.auth import get_user_model 
+from models import PasswordDictionary
+from django.core.exceptions import ValidationError
 
 def l_icon(icon_class, placeholder=None, attrs=None):
     """Shortcut for a left icon text input
@@ -26,6 +28,12 @@ def l_icon_email(icon_class, placeholder=None, attrs=None):
     return BSLeftIconEmailInput(attrs, icon_class)
 
 
+def password_dictionary_validator(value):
+    if PasswordDictionary.objects.filter(password=value).exists():
+        raise ValidationError(("You have chosen an extremely common password. "
+                               "Please choose another."))
+
+
 class DivForm(forms.Form):
     """A form that adds an 'as_div()' method which renders each form element
     inside <div></div> tags.
@@ -45,7 +53,8 @@ class SignUpForm(DivForm):
     username = forms.CharField(min_length=4, max_length=100,
                                widget=l_icon('fa fa-user', 'user name'))
     password = forms.CharField(min_length=6, max_length=100,
-                               widget=l_icon_pw('fa fa-unlock-alt', 'password'))
+                               widget=l_icon_pw('fa fa-unlock-alt', 'password'),
+                               validators = [password_dictionary_validator])
     first_name = forms.CharField(min_length=3, max_length=100,
                                 widget=l_icon('fa fa-info', 'first name'))
     last_name = forms.CharField(min_length=3, max_length=100,

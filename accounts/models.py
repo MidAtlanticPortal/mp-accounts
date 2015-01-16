@@ -30,4 +30,18 @@ class UserData(models.Model):
     profile_image = models.URLField(default=static('accounts/marco_user.png'),
                                     help_text=("URL to the user's profile image."))
     
-    
+class PasswordDictionary(models.Model):
+    """A collection of passwords that we don't accept. 
+    """
+    password = models.CharField(max_length=128)
+
+    class Meta:
+        verbose_name = 'Password Dictionary'
+        verbose_name_plural = 'Password Dictionary'
+
+    def natural_key(self):
+        return self.password
+
+    def __str__(self):
+        return self.password
+
