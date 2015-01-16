@@ -1,8 +1,11 @@
 from django.conf.urls import patterns, include, url
 from django.conf import settings
+from django.views.generic import RedirectView
 
 urlpatterns = patterns('',
     url('^$', 'accounts.views.index', name='index'),
+    url('^login/$', RedirectView.as_view(pattern_name='account:index'), 
+        name='login'),
     url('^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, 
         name='logout'), 
     url('^register/$', 'accounts.views.register', name='register'),
