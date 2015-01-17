@@ -35,7 +35,11 @@ username: {{ user.username }}<br/>
 {# groups: {% for g in user.groups.all %}{{ g.name }}{% empty %}Not a member of any groups{% endfor %}<br/> #}
 {# provider: {% for provider in user.social_auth.all %}{{ provider.provider }}{% endfor %}<br/> #}
 name: {{ user.first_name }} {{ user.last_name }}<br/>
-email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }}<br/>
+email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }} 
+{% if not user.userdata.email_verified %}(<i style='color:red'>not verified</i>)
+<form method="POST" action="{% url 'account:verify_new_email' %}">{% csrf_token %}
+    <button onclick="this.form.submit()">Verify email</button>
+</form>{% endif %}<br/>
 {# is_active: {{ user.is_active }}<br/> #}
 {#    is_super: {{ user.is_superuser }}<br/> #}
 {#    is_staff: {{ user.is_staff }}<br/> #}

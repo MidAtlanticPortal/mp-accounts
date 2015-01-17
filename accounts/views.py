@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
@@ -7,10 +7,11 @@ from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
-from forms import SignUpForm
+from forms import SignUpForm, SocialAccountConfirmEmailForm
 import uuid
 from django.template.loader import get_template
 from django.template.context import Context
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -97,6 +98,45 @@ def register(request):
     return render(request, 'accounts/register.html', c)    
 
 
+@login_required
+def verify_new_email(request):
+    if request.method != 'POST':
+        raise Http404()
+    
+    verify_email_address(request, request.user, False)
+    
+    return render(request, 'accounts/check_your_email.html')
+
+    
+def social_confirm_email(request):
+    data = request.session.get('partial_pipeline')
+    if not data['backend']: 
+        raise HttpResponseRedirect('/')
+    
+    if request.method == 'POST':
+        form = SocialAccountConfirmEmailForm(request.POST)
+        
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            # This is where the session data is stored for Facebook, but
+            # this seems pretty fragile. There should be a method in PSA that
+            # lets me set this directly. 
+            request.session['partial_pipeline']['kwargs']['details']['email'] = email
+            if hasattr(request.session, 'modified'):
+                request.session.modified = True
+
+            return redirect(reverse('social:complete', args=(data['backend'],)))
+    else:
+        form = SocialAccountConfirmEmailForm()
+    
+    c = {
+        'form': form,
+        'backend': data['backend'],
+    }
+    
+    return render(request, 'accounts/social_confirm_email.html', c)
+
+
 def verify_email_address(request, user, activate_user=True):
     """Verify a user's email address. Typically during registration or when 
     an email address is changed. 
@@ -142,13 +182,12 @@ def verify_email(request, code):
 
     if e.activate_user: 
         e.user.is_active = True
-        e.user.properties.email_verified = True
-        e.user.save()
-        e.delete()
-        return render(request, 'accounts/verify_email_success.html')
-
-    else: 
-        raise Http404()
+    
+    e.user.userdata.email_verified = True
+    e.user.userdata.save()
+    e.user.save()
+    e.delete()
+    return render(request, 'accounts/verify_email_success.html')
 
 
 def all_logged_in_users():

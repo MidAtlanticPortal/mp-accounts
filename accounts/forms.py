@@ -79,10 +79,15 @@ class SignUpForm(DivForm):
             self.add_error("email", msg)
 
         return cleaned_data
-         
+
+
 class LogInForm(DivForm):
     username = forms.CharField(min_length=4, max_length=100,
                                widget=l_icon('fa fa-user', 'user name'))
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon('fa fa-unlock-alt', 'password'))
+    
+
+class SocialAccountConfirmEmailForm(DivForm):
+    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
     
