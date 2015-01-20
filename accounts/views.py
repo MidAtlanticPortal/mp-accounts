@@ -8,10 +8,10 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from forms import SignUpForm, SocialAccountConfirmEmailForm
-import uuid
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
+from actions import apply_user_permissions
 
 
 def index(request):
@@ -86,6 +86,7 @@ def register(request):
             user.save()
             user.detail = UserData.objects.create(user=user)
             
+            apply_user_permissions(user)
             verify_email_address(request, user)
             
             return render(request, 'accounts/check_your_email.html')
