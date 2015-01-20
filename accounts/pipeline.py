@@ -9,6 +9,7 @@ from models import UserData
 import urlparse
 import urllib
 from django.shortcuts import redirect
+from actions import apply_user_permissions
 
 
 def get_social_details(user, backend, response, *args, **kwargs):
@@ -46,21 +47,8 @@ def set_user_permissions(strategy, details, user=None, *args, **kwargs):
     """Configure any initial permissions/groups for the user. 
     """
     
-    if not user or user.is_anonymous():
-        return
+    apply_user_permissions(user)
 
-    # test
-    g, created = Group.objects.get_or_create(name='Designers')
-    user.groups.add(g)
-    
-    # Automatically promote @pointnineseven.com users to admins
-    if settings.DEBUG:
-        email = user.email
-        email = email.split('@')
-        if len(email) == 2 and email[1] == 'pointnineseven.com': 
-            user.is_staff = True
-            user.is_superuser = True
-            user.save()
 
 @partial
 def confirm_account(strategy, details, user=None, is_new=False, *args, **kwargs):
