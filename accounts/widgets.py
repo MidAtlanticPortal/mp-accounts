@@ -27,6 +27,12 @@ class BSLeftIconTextInput(TextInput):
 
 class BSLeftIconPasswordInput(BSLeftIconTextInput):
     input_type = 'password'
+    
+    def render(self, name, value, *args, **kwargs):
+        """Clear password on render, so it's not sent back to the client.
+        """
+        return super(BSLeftIconPasswordInput, self).render(name, None, *args, 
+                                                           **kwargs)
 
 class BSLeftIconEmailInput(BSLeftIconTextInput):
     input_type = 'email'
