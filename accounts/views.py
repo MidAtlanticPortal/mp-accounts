@@ -7,11 +7,13 @@ from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
-from forms import SignUpForm, SocialAccountConfirmEmailForm
+from forms import SignUpForm, SocialAccountConfirmEmailForm, ForgotPasswordForm,\
+    ResetPasswordForm
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
-from actions import apply_user_permissions
+from actions import apply_user_permissions, send_password_reset_email,\
+    send_social_auth_provider_login_email
 
 
 def index(request):
@@ -208,6 +210,80 @@ def all_logged_in_users():
                 users.append({'user': user_obj[0], 'until': session.expire_date})
     
     return users
+
+
+def forgot(request): 
+    """Sends a password reset link to a user's validated email address. If 
+    the email address isn't validated, do nothing (?) 
+    """
+    # This doesn't make sense if the user is logged in
+    if not request.user.is_anonymous():
+        return HttpResponseRedirect('/')
+
+    if request.method == 'POST': 
+        User = get_user_model()
+        
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            
+            try: 
+                user = User.objects.get(email=email, 
+                                        userdata__email_verified=True)
+                if user.social_auth.exists():
+                    send_social_auth_provider_login_email(request, user)
+                else:
+                    send_password_reset_email(request, user)
+                    
+            except User.DoesNotExist:
+                pass
+            
+            return render(request, 'accounts/forgot/wait_for_email.html')
+    else:
+        form = ForgotPasswordForm()
+
+    c = {
+        'form': form,
+    }
+    return render(request, 'accounts/forgot/forgot.html', c)
+    
+    
+def forgot_reset(request, code): 
+    """Allows a user who has clicked on a validation link to reset their 
+    password.
+    """
+    # This doesn't make sense if the user is logged in
+    if not request.user.is_anonymous():
+        return HttpResponseRedirect('/')
+    
+    e = get_object_or_404(EmailVerification, verification_code=code)
+    
+    if not e.user.is_active: 
+        raise Http404('Inactive user')
+    
+    if e.user.social_auth.all().exists():
+        raise Http404('User has a social auth login')
+    
+    if request.method == 'POST': 
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            password1 = form.cleaned_data['password1']
+            
+            e.user.set_password(password1)
+            e.user.save()
+            
+            e.delete()
+            
+            return render(request, 'accounts/forgot/reset_successful.html')
+
+    else:
+        form = ResetPasswordForm()
+
+    c = {
+        'form': form,
+        'code': code, 
+    }
+    return render(request, 'accounts/forgot/reset.html', c)
 
 
 if settings.DEBUG:
