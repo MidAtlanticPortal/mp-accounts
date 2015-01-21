@@ -130,8 +130,14 @@ def social_confirm_email(request):
     else:
         form = SocialAccountConfirmEmailForm()
     
+    try: 
+        name = data['kwargs']['details']['first_name']
+    except KeyError: 
+        name = None
+    
     c = {
         'form': form,
+        'user_first_name': name,
         'backend': data['backend'],
     }
     
