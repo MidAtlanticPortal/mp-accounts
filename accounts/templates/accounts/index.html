@@ -40,10 +40,13 @@ email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }}
 <form method="POST" action="{% url 'account:verify_new_email' %}">{% csrf_token %}
     <button onclick="this.form.submit()">Verify email</button>
 </form>{% endif %}<br/>
-{# is_active: {{ user.is_active }}<br/> #}
-{#    is_super: {{ user.is_superuser }}<br/> #}
-{#    is_staff: {{ user.is_staff }}<br/> #}
-{#  last_login: {{ user.last_login }}<br/> #}
-{# date_joined: {{ user.date_joined }}<br/> #}
 
+Member since: {{ user.date_joined|date }}<br/>
+
+Map Group membership:
+<ul>
+    {% for membership in request.user.mapgroupmember_set.all %}
+    <li><a href="{{ membership.map_group.get_absolute_url }}">{{ membership.map_group.name }}</a></li>
+    {% endfor %}
+</ul>
 {% endblock %}
