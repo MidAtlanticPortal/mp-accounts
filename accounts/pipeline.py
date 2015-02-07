@@ -38,12 +38,17 @@ def get_social_details(user, backend, response, strategy, *args, **kwargs):
 
             user.userdata.profile_image = url
 
-    if created: 
-        # Only set email verification flags if we're new. 
-        if strategy.session_get('unverified-email'):
-            user.userdata.email_verified = False
-        else:
-            user.userdata.email_verified = True
+    # TODO: add some logic to figure out when the user is newly added, so we
+    # TODO: can set verification flags. We used to be able to figure out if
+    # TODO: the UserData model was newly created to determine if the user is
+    # TODO: new. However, that happens automatically via post_save signal now,
+    # TODO: so we can no longer rely on that. The PSA framework should provide
+    # TODO: information as to whether a user is new somewhere.
+    # Only set email verification flags if we're new.
+    if strategy.session_get('unverified-email'):
+        user.userdata.email_verified = False
+    else:
+        user.userdata.email_verified = True
 
     user.userdata.save()
 
