@@ -5,7 +5,6 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.conf import settings
 from social.pipeline.partial import partial
-from models import UserData
 import urlparse
 import urllib
 from django.shortcuts import redirect
@@ -18,14 +17,12 @@ def get_social_details(user, backend, response, strategy, *args, **kwargs):
     store it in the user data.
     Right now, we're just extracting the profile picture 
     """
-    data, created = UserData.objects.get_or_create(user=user)
-
     if backend.name == 'facebook':
         facebook_image_url = 'http://graph.facebook.com/v2.2/{id}/picture'
         # append ?redirect=false to get a result in JSON
         id = response.get('id', None)
         if id:
-            data.profile_image = facebook_image_url.format(id=id)
+            user.userdata.profile_image = facebook_image_url.format(id=id)
     
     elif backend.name == 'google-plus':
         url = response.get('image', {})
@@ -39,16 +36,16 @@ def get_social_details(user, backend, response, strategy, *args, **kwargs):
             url = (url.scheme, url.netloc, url.path, query, url.fragment)
             url = urlparse.urlunsplit(url)
 
-            data.profile_image = url
+            user.userdata.profile_image = url
 
     if created: 
         # Only set email verification flags if we're new. 
         if strategy.session_get('unverified-email'):
-            data.email_verified = False
+            user.userdata.email_verified = False
         else:
-            data.email_verified = True
+            user.userdata.email_verified = True
 
-    data.save()
+    user.userdata.save()
 
 def set_user_permissions(strategy, details, user=None, *args, **kwargs):
     """Configure any initial permissions/groups for the user. 
