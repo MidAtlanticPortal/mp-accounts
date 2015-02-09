@@ -29,7 +29,9 @@ class UserData(models.Model):
                                                     "been verified?"))
     profile_image = models.URLField(default=static('accounts/marco_user.png'),
                                     help_text=("URL to the user's profile image."))
-    
+
+
+
 class PasswordDictionary(models.Model):
     """A collection of passwords that we don't accept. 
     """

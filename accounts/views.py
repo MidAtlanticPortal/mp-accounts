@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
-from models import EmailVerification, UserData
+from models import EmailVerification
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
@@ -86,8 +86,7 @@ def register(request):
             user.email = email
            
             user.save()
-            user.detail = UserData.objects.create(user=user)
-            
+
             apply_user_permissions(user)
             verify_email_address(request, user)
             
