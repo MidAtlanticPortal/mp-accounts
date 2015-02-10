@@ -30,6 +30,29 @@ class UserData(models.Model):
     profile_image = models.URLField(default=static('accounts/marco_user.png'),
                                     help_text=("URL to the user's profile image."))
 
+    real_name = models.CharField(max_length=256, default='')
+    preferred_name = models.CharField(max_length=30, default='')
+
+    show_real_name_by_default = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.user.first_name = self.preferred_name
+        self.user.last_name = ''
+        self.user.save()
+        return super(UserData, self).save(*args, **kwargs)
+
+# Patch the User model to return the correct names elseware.
+def auth_user_get_full_name(self):
+    """Returns the Real Name from the UserData model.
+    """
+    return self.userdata.real_name
+User.get_full_name = auth_user_get_full_name
+
+def auth_user_get_short_name(self):
+    """Returns the "Preferred name" from the UserData model.
+    """
+    return self.userdata.preferred_name
+User.get_short_name = auth_user_get_short_name
 
 
 class PasswordDictionary(models.Model):
