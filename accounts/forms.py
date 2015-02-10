@@ -50,17 +50,20 @@ class DivForm(forms.Form):
 
     
 class SignUpForm(DivForm):
-    username = forms.CharField(min_length=4, max_length=100,
-                               widget=l_icon('fa fa-user', 'user name'))
+    real_name = forms.CharField(min_length=3, max_length=100,
+                                widget=l_icon('fa fa-info', 'real name'))
+
+    preferred_name = forms.CharField(min_length=2, max_length=100,
+                                     widget=l_icon('fa fa-info', 'preferred name'))
+
+    # hide_real_name = forms.BooleanField()
+
+    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
+
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon_pw('fa fa-unlock-alt', 'password'),
                                validators=[password_dictionary_validator])
-    first_name = forms.CharField(min_length=3, max_length=100,
-                                widget=l_icon('fa fa-info', 'first name'))
-    last_name = forms.CharField(min_length=3, max_length=100,
-                                widget=l_icon('fa fa-info', 'last name'))
-    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
-    
+
     def clean(self):
         """Raise a validation error if the username or email address provided
         are already in use. 
@@ -82,10 +85,10 @@ class SignUpForm(DivForm):
 
 
 class LogInForm(DivForm):
-    username = forms.CharField(min_length=4, max_length=100,
-                               widget=l_icon('fa fa-user', 'user name'))
+    email = forms.CharField(min_length=4, max_length=100,
+                           widget=l_icon('fa fa-envelope-o', 'email'))
     password = forms.CharField(min_length=6, max_length=100,
-                               widget=l_icon('fa fa-unlock-alt', 'password'))
+                               widget=l_icon_pw('fa fa-unlock-alt', 'password'))
     
 
 class ForgotPasswordForm(DivForm):

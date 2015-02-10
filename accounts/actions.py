@@ -1,3 +1,5 @@
+from django.utils.crypto import get_random_string
+import re
 from django.contrib.auth.models import Group
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -99,4 +101,20 @@ def send_social_auth_provider_login_email(request, user):
 
     user.email_user('MARCO Sign-in Information', body_txt, 
                     html_message=body_html, fail_silently=False)
+
+
+def generate_username(email):
+    """Generates a uniquish username from an email address.
+    We aren't using usernames, but we haven't modified django to ignore them
+    either.
+    """
+    # Emails are unique, but may be too long or too short.
+    # Grab at most 20 chars from the email, and then append random chars.
+    username = email[:20].lower()
+    username = username + '_' + get_random_string(30 - 1 - len(username))
+
+    # Replace anything that will fail the User's validation regex
+    username = re.subn(r'[^\w.@+-]', '_', username)[0]
+
+    return username
 

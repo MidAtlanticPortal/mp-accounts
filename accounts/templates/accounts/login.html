@@ -81,20 +81,10 @@ function googlePlusSignIn(authResult) {
             }
             </style>
                 {% csrf_token %}
-                <div class="left-inner-addon">
-                    <i class="fa fa-user"></i>
-                    <input id="dj-username" type="text" class="form-control" 
-                           name="username" placeholder="user name" />
-                </div>
 
-                <div class="left-inner-addon">
-                    <i class="fa fa-unlock-alt"></i>
-                
-                    <input id="dj-password" name="password" type="password" 
-                           class="form-control" placeholder="password"
-                           style="line-height: 2em; border-left: none" />
-                </div>
-                
+                {{ form.as_div }}
+
+
                 <div>
                     <button onclick='this.form.submit()'>Log in &rarr;</button>
                 </div>

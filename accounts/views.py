@@ -1,19 +1,22 @@
+from django.utils.crypto import get_random_string
+import re
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user_model
-from models import EmailVerification
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
-from forms import SignUpForm, ForgotPasswordForm,\
-    ResetPasswordForm, SocialAccountConfirmForm
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
+
+from models import EmailVerification
+from forms import SignUpForm, ForgotPasswordForm,\
+    ResetPasswordForm, SocialAccountConfirmForm, LogInForm
 from actions import apply_user_permissions, send_password_reset_email,\
-    send_social_auth_provider_login_email
+    send_social_auth_provider_login_email, generate_username
 
 
 def index(request):
@@ -34,26 +37,45 @@ def index(request):
 def login_page(request):
     """The login view. Served from index()
     """
+    User = get_user_model()
+
     next_page = request.GET.get('next', '/')
     c = {}
     
-    if request.method == 'POST': 
-        # Try a user/pw login
-        u = request.POST['username']
-        p = request.POST['password']
-        user = authenticate(username=u, password=p)
-        if user is not None: 
-            if user.is_active:
-                login(request, user)
-                return HttpResponseRedirect(next_page)
+    if request.method == 'POST':
+        form = LogInForm(request.POST)
+        if form.is_valid:
+            email = request.POST['email']
+            p = request.POST['password']
+
+            # We can't actually authenticate with an email address. So, we have
+            # to query the User models by email address to find a username,
+            # and once we have that we can use the username to log in.
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return render(request, 'accounts/invalid_credentials.html')
+
+            user = authenticate(username=user.username, password=p)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(next_page)
+                else:
+                    return render(request, 'accounts/invalid_credentials.html')
             else:
-                return HttpResponse("Access Denied", status=403)
+                return render(request, 'accounts/invalid_credentials.html')
         else:
             return render(request, 'accounts/invalid_credentials.html')
+    else:
+        form = LogInForm()
+
+    # TODO: Fix the else staircase, refactor this as a FormView
 
     c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY, 
              GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
-             next=next_page)
+             next=next_page,
+             form=form)
     
     return render(request, 'accounts/login.html', c)
 
@@ -68,11 +90,12 @@ def register(request):
     if request.method == 'POST': 
         form = SignUpForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            first_name = form.cleaned_data['first_name']
-            last_name = form.cleaned_data['last_name']
+            real_name = form.cleaned_data['real_name']
+            preferred_name = form.cleaned_data['preferred_name']
             email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            username = generate_username(email)
+
             user, created = get_user_model().objects.get_or_create(username=username)
             if not created: 
                 # This may happen if the form is submitted outside the normal
@@ -81,11 +104,12 @@ def register(request):
 
             user.is_active = False  # not validated yet
             user.set_password(password)
-            user.first_name = first_name
-            user.last_name = last_name
             user.email = email
-           
             user.save()
+
+            user.userdata.real_name = real_name
+            user.userdata.preferred_name = preferred_name
+            user.userdata.save()
 
             apply_user_permissions(user)
             verify_email_address(request, user)
