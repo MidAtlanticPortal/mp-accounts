@@ -12,8 +12,6 @@ urlpatterns = [
     url('^forgot/$', 'accounts.views.forgot', name='forgot_password'),
     url('^forgot/(?P<code>[a-f0-9]{32})$', 'accounts.views.forgot_reset', 
         name='forgot_reset'),
-    url('^confirm-email/$', 'accounts.views.social_confirm_email', 
-        name='social_confirm_email'),
     url('^confirm-account/$', 'accounts.views.social_confirm',
         name='social_confirm'),
     url('^verify_new_email$', 'accounts.views.verify_new_email',
