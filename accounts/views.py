@@ -8,7 +8,7 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
 from forms import SignUpForm, SocialAccountConfirmEmailForm, ForgotPasswordForm,\
-    ResetPasswordForm
+    ResetPasswordForm, SocialAccountConfirmForm
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
@@ -109,7 +109,61 @@ def verify_new_email(request):
     
     return render(request, 'accounts/check_your_email.html')
 
-    
+
+def social_confirm(request):
+    data = request.session.get('partial_pipeline')
+    if not data['backend']:
+        raise HttpResponseRedirect('/')
+
+    if request.method == 'POST':
+        form = SocialAccountConfirmForm(request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            preferred_name = form.cleaned_data['preferred_name']
+            real_name = form.cleaned_data['real_name']
+
+            # if email is different than the auth provider's version, then
+            # mark it as unverified.
+            if email.lower() != data['kwargs']['details']['email'].lower():
+                data['kwargs']['email-unverified'] = True
+
+            # This is where the session data is stored for Facebook, but
+            # this seems pretty fragile. There should be a method in PSA that
+            # lets me set this directly.
+
+            data['kwargs']['details']['email'] = email
+            data['kwargs']['details']['preferred_name'] = preferred_name
+            data['kwargs']['details']['real_name'] = real_name
+            # add if email != data[...]email, then flag as unverified
+            request.session['partial_pipeline'] = data
+
+            if hasattr(request.session, 'modified'):
+                request.session.modified = True
+
+            return redirect(reverse('social:complete', args=(data['backend'],)))
+    else:
+        form = SocialAccountConfirmForm({
+            # create the form with defaults from the auth provider
+            'email': data['kwargs']['details'].get('email', ''),
+            'real_name': data['kwargs']['details'].get('fullname', ''),
+            'preferred_name': data['kwargs']['details'].get('first_name', ''),
+        })
+
+    try:
+        name = data['kwargs']['details']['first_name']
+    except KeyError:
+        name = None
+
+    c = {
+        'form': form,
+        'user_first_name': name,
+        'backend': data['backend'],
+    }
+
+    return render(request, 'accounts/social_confirm.html', c)
+
+
 def social_confirm_email(request):
     data = request.session.get('partial_pipeline')
     if not data['backend']: 

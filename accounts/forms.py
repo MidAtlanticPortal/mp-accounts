@@ -118,4 +118,16 @@ class ResetPasswordForm(DivForm):
 
 class SocialAccountConfirmEmailForm(DivForm):
     email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
-    
+
+
+class SocialAccountConfirmForm(DivForm):
+    """A form that allows the user to enter some of their pertinant details
+    before continuing to the site.
+    """
+    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
+
+    real_name = forms.CharField(min_length=3, max_length=256,
+                                widget=l_icon('fa fa-user', 'Real Name'))
+    preferred_name = forms.CharField(min_length=3, max_length=30,
+                                     widget=l_icon('fa fa-user', 'Preferred Name'))
+
