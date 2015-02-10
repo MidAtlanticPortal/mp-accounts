@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse
-from forms import SignUpForm, SocialAccountConfirmEmailForm, ForgotPasswordForm,\
+from forms import SignUpForm, ForgotPasswordForm,\
     ResetPasswordForm, SocialAccountConfirmForm
 from django.template.loader import get_template
 from django.template.context import Context
