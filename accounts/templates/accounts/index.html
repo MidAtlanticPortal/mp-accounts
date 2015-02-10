@@ -7,7 +7,7 @@
 <div style="width: 50%; float: right;">
     All Users:<br />
     {% for u in users %}
-    username: {{ u.username }} {{ u.email }} {% for provider in u.social_auth.all %}{{ provider.provider }}{% endfor %}<br />
+    username: {{ u.get_short_name }} {{ u.email }} {% for provider in u.social_auth.all %}{{ provider.provider }}{% endfor %}<br />
     {% endfor %}
     <hr/>
     Active sessions:<br/> 

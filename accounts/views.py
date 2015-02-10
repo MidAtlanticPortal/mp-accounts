@@ -164,41 +164,6 @@ def social_confirm(request):
     return render(request, 'accounts/social_confirm.html', c)
 
 
-def social_confirm_email(request):
-    data = request.session.get('partial_pipeline')
-    if not data['backend']: 
-        raise HttpResponseRedirect('/')
-    
-    if request.method == 'POST':
-        form = SocialAccountConfirmEmailForm(request.POST)
-        
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            # This is where the session data is stored for Facebook, but
-            # this seems pretty fragile. There should be a method in PSA that
-            # lets me set this directly. 
-            request.session['partial_pipeline']['kwargs']['details']['email'] = email
-            if hasattr(request.session, 'modified'):
-                request.session.modified = True
-
-            return redirect(reverse('social:complete', args=(data['backend'],)))
-    else:
-        form = SocialAccountConfirmEmailForm()
-    
-    try: 
-        name = data['kwargs']['details']['first_name']
-    except KeyError: 
-        name = None
-    
-    c = {
-        'form': form,
-        'user_first_name': name,
-        'backend': data['backend'],
-    }
-    
-    return render(request, 'accounts/social_confirm_email.html', c)
-
-
 def verify_email_address(request, user, activate_user=True):
     """Verify a user's email address. Typically during registration or when 
     an email address is changed. 

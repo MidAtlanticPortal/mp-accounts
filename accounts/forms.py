@@ -116,10 +116,6 @@ class ResetPasswordForm(DivForm):
         return cleaned_data
     
 
-class SocialAccountConfirmEmailForm(DivForm):
-    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
-
-
 class SocialAccountConfirmForm(DivForm):
     """A form that allows the user to enter some of their pertinant details
     before continuing to the site.
