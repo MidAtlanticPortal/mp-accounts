@@ -69,6 +69,7 @@ email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }}
     <button onclick="this.form.submit()">Verify email</button>
 </form>{% endif %}<br/>
 
+<a href="{% url 'account:edit' %}">Edit my info</a>
 Member since: {{ user.date_joined|date }}<br/>
 
 Map Group membership:

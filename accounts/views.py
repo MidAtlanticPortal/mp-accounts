@@ -1,4 +1,5 @@
 from django.utils.crypto import get_random_string
+from django.views.generic import FormView
 import re
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
@@ -7,14 +8,14 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
 
 from models import EmailVerification
 from forms import SignUpForm, ForgotPasswordForm,\
-    ResetPasswordForm, SocialAccountConfirmForm, LogInForm
+    ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm
 from actions import apply_user_permissions, send_password_reset_email,\
     send_social_auth_provider_login_email, generate_username
 
@@ -78,6 +79,36 @@ def login_page(request):
     
     return render(request, 'accounts/login.html', c)
 
+
+class UserDetailView(FormView):
+    template_name = 'accounts/user_detail_form.html'
+    form_class = UserDetailForm
+    success_url = reverse_lazy('account:index')
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        return {
+            'preferred_name': self.request.user.userdata.preferred_name,
+            'real_name': self.request.user.userdata.real_name,
+            'email': self.request.user.email,
+        }
+
+
+    def form_valid(self, form):
+        u = self.request.user
+        u.userdata.preferred_name = form.cleaned_data['preferred_name']
+        u.userdata.real_name = form.cleaned_data['real_name']
+        if form.cleaned_data['email'].lower() != u.email:
+            u.email = form.cleaned_data['email']
+            u.userdata.email_verified = False
+            u.emailverification_set.all().delete()
+
+        u.save()
+        u.userdata.save()
+
+        return super(FormView, self).form_valid(form)
 
 def register(request):
     """Show the registration page.
