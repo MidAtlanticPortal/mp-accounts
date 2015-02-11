@@ -26,7 +26,7 @@
     {% for u in users %}
         <li>
             <dl>
-                <dt>preferred name</dt><dd>&ldquo;{{ u.get_short_name }}&rdquo;</dd>
+                <dt>preferred name</dt><dd>&ldquo;{{ u.get_short_name }}&rdquo; (id={{u.pk}})</dd>
                 <dt>name</dt><dd>&ldquo;{{ u.get_full_name }}&rdquo;</dd>
                 <dt>email</dt>
                     <dd>{{ u.email }}</dd>

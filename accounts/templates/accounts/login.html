@@ -46,6 +46,7 @@ function googlePlusSignIn(authResult) {
 }
 
 </script>
+
 <script src="https://apis.google.com/js/client:platform.js?onload=gplusButton" async defer></script>
 
 <div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
@@ -100,14 +101,26 @@ function googlePlusSignIn(authResult) {
     </div>
 
 
-    <div style="position: relative; width: 50%; margin: 0 auto; 
-                border-radius: 8px; padding: 1em; 
+    <div style="position: relative; width: 250px; margin: 0 auto;
+                border-radius: 8px; padding: 1em 1em 0.5em 1em;
                 background-color: rgba(0, 0, 0, 0.0625);">
+
         <div style="margin-bottom: 1ex; height: 3em;">
             <div style="border-radius: 6px; padding: 0.5em 0.5em; background-image: -webkit-linear-gradient(top, rgb(76, 105, 186), rgb(59, 85, 160)); background-image: -moz-linear-gradient(top, rgb(76, 105, 186), rgb(59, 85, 160));">
                 <a style="font-family: Helvetica, Arial; color: white; display: block;" href="{% url 'social:begin' 'facebook' %}?next={{ next }}"> 
                     <i class="fa fa-2x fa-facebook-square" style="margin-top: -3px; float:left"></i>
                     <span style="margin-left: 0.75em;"> Sign in with <b>Facebook</b></span>
+                </a>
+            </div>
+        </div>
+
+        <div style="height: 3em;">
+            <div style="border-radius: 6px; padding: 0.5em 0.5em;
+                        background-image: -webkit-linear-gradient(top, rgb(108, 182, 240), rgb(85, 172, 240));
+                        background-image: -moz-linear-gradient(top, rgb(108, 182, 240), rgb(85, 172, 240));">
+                <a style="font-family: Helvetica, Arial; color: white; display: block;" href="{% url 'social:begin' 'twitter' %}?next={{ next }}">
+                    <i class="fa fa-2x fa-twitter-square" style="margin-top: -3px; float:left"></i>
+                    <span style="margin-left: 0.75em;"> Sign in with <b>Twitter</b></span>
                 </a>
             </div>
         </div>
@@ -123,8 +136,7 @@ function googlePlusSignIn(authResult) {
         </div>
     </div>
     
-
-    <p style="text-align: center"><a href="{% url 'account:forgot_password' %}">I forgot my password</a> &bull; <a href="{% url 'account:register' %}">I need to register</a></p>
+    <p style="margin-top: 1em; text-align: center"><a href="{% url 'account:forgot_password' %}">I forgot my password</a> &bull; <a href="{% url 'account:register' %}">I need to register</a></p>
 
 </div>
 

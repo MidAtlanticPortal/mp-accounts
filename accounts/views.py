@@ -167,12 +167,17 @@ def social_confirm(request):
 
             return redirect(reverse('social:complete', args=(data['backend'],)))
     else:
-        form = SocialAccountConfirmForm({
+        initial = {
             # create the form with defaults from the auth provider
             'email': data['kwargs']['details'].get('email', ''),
             'real_name': data['kwargs']['details'].get('fullname', ''),
             'preferred_name': data['kwargs']['details'].get('first_name', ''),
-        })
+        }
+        if data.get('backend', '') == 'twitter':
+            twitter_username = data['kwargs']['details'].get('username', '')
+            if twitter_username:
+                initial['preferred_name'] = twitter_username
+        form = SocialAccountConfirmForm(initial)
 
     try:
         name = data['kwargs']['details']['first_name']
