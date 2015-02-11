@@ -272,7 +272,7 @@ def forgot(request):
             try: 
                 user = User.objects.get(email=email, 
                                         userdata__email_verified=True)
-                if user.social_auth.exists():
+                if getattr(user, 'social_auth', None) and user.social_auth.exists():
                     send_social_auth_provider_login_email(request, user)
                 else:
                     send_password_reset_email(request, user)
@@ -303,7 +303,7 @@ def forgot_reset(request, code):
     if not e.user.is_active: 
         raise Http404('Inactive user')
     
-    if e.user.social_auth.all().exists():
+    if getattr(e.user, 'social_auth', None) and e.user.social_auth.all().exists():
         raise Http404('User has a social auth login')
     
     if request.method == 'POST': 

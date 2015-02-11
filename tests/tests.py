@@ -1,5 +1,6 @@
 import random 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from accounts.context_processors import login_disabled
 from django.contrib.auth.models import User
@@ -12,14 +13,14 @@ from django.test.testcases import SimpleTestCase
 from django.utils.crypto import get_random_string
 
 def test_user(create=True, username=None, password=None,
-              first_name=None, last_name=None, email=None):
+              preferred_name=None, real_name=None, email=None):
     """Get or create our test user. 
     """
     
     info = dict(username=username or get_random_string(8),
                 password=password or get_random_string(8),
-                first_name=first_name or get_random_string(8), 
-                last_name=last_name or get_random_string(8),
+                preferred_name=preferred_name or get_random_string(8),
+                real_name=real_name or get_random_string(8),
                 email=email or ''.join([get_random_string(8), '@', 
                                         get_random_string(8), '.com']))
     
@@ -27,11 +28,12 @@ def test_user(create=True, username=None, password=None,
         u, created = User.objects.get_or_create(username=info['username'])
         if created:
             u.set_password(password)
-            u.first_name = info['first_name']
-            u.last_name = info['last_name']
             u.email = info['email']
             u.save()
             u.userdata.email_verified = True
+            u.userdata.preferred_name= info['preferred_name']
+            u.userdata.real_name = info['real_name']
+
             u.userdata.save()
     else:
         u = None
@@ -136,7 +138,7 @@ class RegisterTests(SimpleTestCase):
     
     def testRegisterTemplate(self):
         c = Client()
-        r = c.get('/account/register/')
+        r = c.get(reverse('account:register'))
         self.assertEqual(r.status_code, 200)
         self.assertTrue('register.html' in r.templates[0].name)
 
@@ -144,35 +146,37 @@ class RegisterTests(SimpleTestCase):
         c = Client()
         user, d = test_user(create=False)
         del d['username']
-        r = c.post('/account/register/', d)
+        r = c.post(reverse('account:register'), d)
         self.assertTrue(r.status_code, 200)
         
     def testRegisterNoPassword(self):
         c = Client()
         user, d = test_user(create=False)
         del d['password']
-        r = c.post('/account/register/', d)
+        r = c.post(reverse('account:register'), d)
         self.assertTrue(r.status_code, 200)
         
-    def testRegisterNoFirstName(self):
+    def testRegisterNoRealName(self):
         c = Client()
-        user, d = test_user(create=False)
-        del d['first_name']
-        r = c.post('/account/register/', d)
+        _, d = test_user(create=False)
+        del d['real_name']
+        r = c.post(reverse('account:register'), d)
         self.assertTrue(r.status_code, 200)
+        self.assertFalse(User.objects.filter(email=d['email']).exists())
         
-    def testRegisterNoLastName(self):
+    def testRegisterNoPreferredName(self):
         c = Client()
-        user, d = test_user(create=False)
-        del d['last_name']
-        r = c.post('/account/register/', d)
+        _, d = test_user(create=False)
+        del d['preferred_name']
+        r = c.post(reverse('account:register'), d)
         self.assertTrue(r.status_code, 200)
+        self.assertFalse(User.objects.filter(email=d['email']).exists())
 
     def testRegisterNoEmail(self):
         c = Client()
-        user, d = test_user(create=False)
+        _, d = test_user(create=False)
         del d['email']
-        r = c.post('/account/register/', d)
+        r = c.post(reverse('account:register'), d)
         self.assertTrue(r.status_code, 200)
 
     def testRegisterLoggedIn(self):
@@ -180,11 +184,11 @@ class RegisterTests(SimpleTestCase):
 
         user, info = test_user()
         
-        c.login(username=info['username'],
+        c.login(username=user.username,
                 password=info['password'])
-        r = c.get('/account/register/')
+        r = c.get(reverse('account:register'))
         # FIXME: I'm not sure why this is failing. 
-#         self.assertEqual(r.status_code, 302, "Register didn't redirected when logged in")
+        # self.assertEqual(r.status_code, 301, "Register didn't redirected when logged in")
         
         c.logout()
         user.delete()
@@ -193,13 +197,13 @@ class RegisterTests(SimpleTestCase):
         c = Client()
         _, info = test_user(create=False)
 
-        r = c.post('/account/register/', info)
+        r = c.post(reverse('account:register'), info)
         self.assertEqual(r.status_code, 200)
         
         # we should have an inactive user with an unverified email addr, and a 
         # verification record
 
-        u = User.objects.filter(username=info['username'])
+        u = User.objects.filter(email=info['email'])
         self.assertTrue(u.exists(), 'user was not created')
         u = u[0]
         self.assertFalse(u.is_active, 'user was created active')

@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.conf import settings
 from django.views.generic import RedirectView
 
-urlpatterns = [
+_urlpatterns = [
     url('^$', 'accounts.views.index', name='index'),
     url('^login/$', RedirectView.as_view(pattern_name='account:index'), 
         name='login'),
@@ -22,6 +22,16 @@ urlpatterns = [
 
 
 if settings.DEBUG:
-    urlpatterns.extend([
+    _urlpatterns.extend([
         url('^promote-user$', 'accounts.views.promote_user'),
     ])
+
+
+def urls(namespace='account'):
+    """Returns a 3-tuple for use with include().
+
+    The including module or project can refer to urls as namespace:urlname,
+    internally, they are referred to as app_name:urlname.
+    """
+    return (_urlpatterns, 'account', namespace)
+

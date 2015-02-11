@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
+import accounts.urls
 
 urlpatterns = [
-    url(r'^a/', include('accounts.urls')),
+    url(r'^account/', include(accounts.urls.urls(namespace='account'))),
 ]
