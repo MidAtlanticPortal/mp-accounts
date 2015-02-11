@@ -7,6 +7,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
 
+    'social',
     'tests',
     'accounts.apps.AccountsAppConfig',
 ]
@@ -29,3 +30,6 @@ ROOT_URLCONF = 'tests.urls'
 
 SHARING_TO_PUBLIC_GROUPS = ['Share with Public']
 SHARING_TO_STAFF_GROUPS = ['Share with Staff']
+
+SOCIAL_AUTH_GOOGLE_PLUS_KEY = 'BLAH'
+SOCIAL_AUTH_GOOGLE_PLUS_SCOPES = ['EMAIL']

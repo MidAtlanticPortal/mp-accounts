@@ -1,6 +1,8 @@
 # Some BS-friendly widgets
 
-from django.forms.widgets import TextInput
+from django.forms.widgets import TextInput, CheckboxInput
+from django.utils.html import format_html
+
 
 class BSLeftIconTextInput(TextInput):
     """A text input with a bootstrap icon on the left side of the field.
@@ -36,3 +38,4 @@ class BSLeftIconPasswordInput(BSLeftIconTextInput):
 
 class BSLeftIconEmailInput(BSLeftIconTextInput):
     input_type = 'email'
+

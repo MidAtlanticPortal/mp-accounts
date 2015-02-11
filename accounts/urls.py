@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.conf import settings
 from django.views.generic import RedirectView
 
-urlpatterns = [
+_urlpatterns = [
     url('^$', 'accounts.views.index', name='index'),
     url('^login/$', RedirectView.as_view(pattern_name='account:index'), 
         name='login'),
@@ -12,9 +12,9 @@ urlpatterns = [
     url('^forgot/$', 'accounts.views.forgot', name='forgot_password'),
     url('^forgot/(?P<code>[a-f0-9]{32})$', 'accounts.views.forgot_reset', 
         name='forgot_reset'),
-    url('^confirm-email/$', 'accounts.views.social_confirm_email', 
-        name='social_confirm_email'),
-    url('^verify_new_email$', 'accounts.views.verify_new_email', 
+    url('^confirm-account/$', 'accounts.views.social_confirm',
+        name='social_confirm'),
+    url('^verify_new_email$', 'accounts.views.verify_new_email',
         name='verify_new_email'),
     url('^verify/(?P<code>[a-f0-9]{32})$', 'accounts.views.verify_email', 
         name='verify_email'),
@@ -22,6 +22,16 @@ urlpatterns = [
 
 
 if settings.DEBUG:
-    urlpatterns.extend([
+    _urlpatterns.extend([
         url('^promote-user$', 'accounts.views.promote_user'),
     ])
+
+
+def urls(namespace='account'):
+    """Returns a 3-tuple for use with include().
+
+    The including module or project can refer to urls as namespace:urlname,
+    internally, they are referred to as app_name:urlname.
+    """
+    return (_urlpatterns, 'account', namespace)
+

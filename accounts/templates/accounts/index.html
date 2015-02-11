@@ -5,10 +5,37 @@
 <h3>Hello, {{ user.first_name }}. </h3>
 
 <div style="width: 50%; float: right;">
+    <style>
+        dt {
+            float:left;
+            clear:left;
+            text-align: right;
+            width: 120px;
+        }
+        dt:after {
+            content: ": ";
+        }
+        dd {
+            margin: 0 0 0 125px;
+            padding: 0 0 0 0;
+        }
+
+    </style>
     All Users:<br />
+    <ol>
     {% for u in users %}
-    username: {{ u.username }} {{ u.email }} {% for provider in u.social_auth.all %}{{ provider.provider }}{% endfor %}<br />
+        <li>
+            <dl>
+                <dt>preferred name</dt><dd>&ldquo;{{ u.get_short_name }}&rdquo;</dd>
+                <dt>name</dt><dd>&ldquo;{{ u.get_full_name }}&rdquo;</dd>
+                <dt>email</dt>
+                    <dd>{{ u.email }}</dd>
+                <dt>auth provider</dt>
+                    <dd>{% for provider in u.social_auth.all %}{{ provider.provider }}{% empty %}django{% endfor %}</dd>
+            </dl>
+        </li>
     {% endfor %}
+    </ol>
     <hr/>
     Active sessions:<br/> 
     {% for session in sessions %}
@@ -34,8 +61,9 @@ Would you like to
 username: {{ user.username }}<br/>
 {# groups: {% for g in user.groups.all %}{{ g.name }}{% empty %}Not a member of any groups{% endfor %}<br/> #}
 {# provider: {% for provider in user.social_auth.all %}{{ provider.provider }}{% endfor %}<br/> #}
-name: {{ user.first_name }} {{ user.last_name }}<br/>
-email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }} 
+Name: {{ user.get_full_name }}<br/>
+Preferred Name: {{ user.get_short_name }}<br />
+email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }}
 {% if not user.userdata.email_verified %}(<i style='color:red'>not verified</i>)
 <form method="POST" action="{% url 'account:verify_new_email' %}">{% csrf_token %}
     <button onclick="this.form.submit()">Verify email</button>

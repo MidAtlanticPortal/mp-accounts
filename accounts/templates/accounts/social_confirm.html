@@ -7,9 +7,9 @@
 
 <div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
     {% if user_first_name %}<h2 style="text-align: center;">Hello, {{ user_first_name }}</h2>{% endif %}
-    <h3 style="text-align: center;">Please enter your email address</h3>
+    <h3 style="text-align: center;">Please confirm your account details.</h3>
     <div>
-        <form class="login-form" method="POST" action="{% url 'account:social_confirm_email' %}">
+        <form class="login-form" method="POST" action="{% url 'account:social_confirm' %}">
             <style>
             .login-form {
                 margin-bottom: 1em;
