@@ -2,6 +2,7 @@
 
 {% block content %}
 
+{% comment %}
 <script>
 var gplusButtonCreated = false;
 window.setTimeout(function() {
@@ -46,6 +47,7 @@ function googlePlusSignIn(authResult) {
 }
 
 </script>
+{% endcomment %}
 
 <script src="https://apis.google.com/js/client:platform.js?onload=gplusButton" async defer></script>
 
@@ -125,6 +127,7 @@ function googlePlusSignIn(authResult) {
             </div>
         </div>
 
+        {% comment %}
         <div style="height: 3em;">
             <form id="googlePlusSignInForm" method="post" action="{% url 'social:complete' 'google-plus' %}?next={{ next }}">
                 {% csrf_token %}
@@ -134,6 +137,7 @@ function googlePlusSignIn(authResult) {
 
             <div id="signinButton"></div>
         </div>
+        {% endcomment %}
     </div>
     
     <p style="margin-top: 1em; text-align: center"><a href="{% url 'account:forgot_password' %}">I forgot my password</a> &bull; <a href="{% url 'account:register' %}">I need to register</a></p>

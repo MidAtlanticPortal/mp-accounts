@@ -46,8 +46,6 @@ def get_social_details(user, backend, response, details, strategy, *args, **kwar
         url = response.get('profile_image_url_https', '')
         if url:
             user.userdata.profile_image = url
-        pass
-
 
     # If this is a new account, set the user's real & preferred names.
     if strategy.session_get('new_account'):
