@@ -72,10 +72,9 @@ def login_page(request):
 
     # TODO: Fix the else staircase, refactor this as a FormView
 
-    c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY, 
-             GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
-             next=next_page,
-             form=form)
+    # c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY,
+    #          GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
+    c = dict(next=next_page, form=form)
     
     return render(request, 'accounts/login.html', c)
 
