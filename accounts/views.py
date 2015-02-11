@@ -18,6 +18,7 @@ from forms import SignUpForm, ForgotPasswordForm,\
     ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm
 from actions import apply_user_permissions, send_password_reset_email,\
     send_social_auth_provider_login_email, generate_username
+from nursery.view_helpers import decorate_view
 
 
 def index(request):
@@ -80,6 +81,7 @@ def login_page(request):
     return render(request, 'accounts/login.html', c)
 
 
+@decorate_view(login_required)
 class UserDetailView(FormView):
     template_name = 'accounts/user_detail_form.html'
     form_class = UserDetailForm
