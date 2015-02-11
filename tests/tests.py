@@ -8,7 +8,7 @@ from django.test.client import Client
 from django.core import mail
 from django.core.mail import mail_admins
 import re
-from accounts.models import EmailVerification
+from accounts.models import EmailVerification, UserData
 from django.test.testcases import SimpleTestCase
 from django.utils.crypto import get_random_string
 
