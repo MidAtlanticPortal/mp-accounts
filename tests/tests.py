@@ -237,9 +237,15 @@ class AccountEditTests(TestCase):
         # user.refresh_from_db() # we don't get this until dj1.8...
         user = User.objects.get(pk=user.pk)
         self.assertFalse(user.userdata.email_verified)
+        self.assertTrue(user.emailverification_set.all().exists())
         self.assertEqual(user.first_name, user.userdata.preferred_name)
         self.assertEqual(user.last_name, '')
         self.assertEqual(user.userdata.preferred_name,
                          change_info['preferred_name'])
         self.assertEqual(user.userdata.real_name, change_info['real_name'])
         self.assertEqual(user.email, change_info['email'])
+
+    def testEditRequiresLogin(self):
+        c = Client()
+        resp = c.get(reverse('account:edit'))
+        self.assertEqual(resp.status_code, 302)
