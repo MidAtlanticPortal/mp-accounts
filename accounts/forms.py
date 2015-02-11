@@ -130,3 +130,8 @@ class SocialAccountConfirmForm(DivForm):
     preferred_name = forms.CharField(min_length=3, max_length=30,
                                      widget=l_icon('fa fa-user', 'Preferred Name'))
 
+class UserDetailForm(SocialAccountConfirmForm):
+    """A form for a user editing their info.
+    Currently identical to the Social account confirmation form.
+    """
+    pass

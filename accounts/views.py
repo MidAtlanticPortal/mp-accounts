@@ -1,5 +1,4 @@
-from django.utils.crypto import get_random_string
-import re
+from django.views.generic import FormView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib.sessions.models import Session
@@ -7,16 +6,17 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
 
 from models import EmailVerification
 from forms import SignUpForm, ForgotPasswordForm,\
-    ResetPasswordForm, SocialAccountConfirmForm, LogInForm
+    ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm
 from actions import apply_user_permissions, send_password_reset_email,\
     send_social_auth_provider_login_email, generate_username
+from nursery.view_helpers import decorate_view
 
 
 def index(request):
@@ -78,6 +78,43 @@ def login_page(request):
     
     return render(request, 'accounts/login.html', c)
 
+
+@decorate_view(login_required)
+class UserDetailView(FormView):
+    template_name = 'accounts/user_detail_form.html'
+    form_class = UserDetailForm
+    success_url = reverse_lazy('account:index')
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        return {
+            'preferred_name': self.request.user.userdata.preferred_name,
+            'real_name': self.request.user.userdata.real_name,
+            'email': self.request.user.email,
+        }
+
+
+    def form_valid(self, form):
+        do_verification = False
+
+        u = self.request.user
+        u.userdata.preferred_name = form.cleaned_data['preferred_name']
+        u.userdata.real_name = form.cleaned_data['real_name']
+        if form.cleaned_data['email'].lower() != u.email:
+            u.email = form.cleaned_data['email']
+            u.userdata.email_verified = False
+            u.emailverification_set.all().delete()
+            do_verification = True
+
+        u.save()
+        u.userdata.save()
+
+        if do_verification:
+            verify_email_address(self.request, u, activate_user=False)
+
+        return super(FormView, self).form_valid(form)
 
 def register(request):
     """Show the registration page.
@@ -193,17 +230,10 @@ def social_confirm(request):
 
 
 def verify_email_address(request, user, activate_user=True):
-    """Verify a user's email address. Typically during registration or when 
-    an email address is changed. 
+    """Verify a user's email address. Typically during registration or when
+    an email address is changed.
     """
 
-    # TODO: Store this with the user itself
-    # This is a temporary hack to get around having to create a new 
-    # user model right now. The problem with this is that the code is 
-    # stored in the current session, so use must the same browser 
-    # session to validate your email address. In most cases that's 
-    # probably fine, but in many cases it won't work. 
-    
     e = EmailVerification()
     e.user = user
     e.email_to_verify = user.email
@@ -215,16 +245,16 @@ def verify_email_address(request, user, activate_user=True):
 def send_verification_email(request, e):
     """Send a verification link to the specified user.
     """
-    
-    url = request.build_absolute_uri(reverse('account:verify_email', 
+
+    url = request.build_absolute_uri(reverse('account:verify_email',
                                              args=(e.verification_code,)))
-    
+
     context = Context({'name': e.user.get_short_name(), 'url': url})
     template = get_template('accounts/mail/verify_email.txt')
     body_txt = template.render(context)
     template = get_template('accounts/mail/verify_email.html')
     body_html = template.render(context)
-    e.user.email_user('Please verify your email address', body_txt, 
+    e.user.email_user('Please verify your email address', body_txt,
                       html_message=body_html, fail_silently=False)
 
 

@@ -27,7 +27,7 @@ def test_user(create=True, username=None, password=None,
     if create:
         u, created = User.objects.get_or_create(username=info['username'])
         if created:
-            u.set_password(password)
+            u.set_password(info['password'])
             u.email = info['email']
             u.save()
             u.userdata.email_verified = True
@@ -218,3 +218,34 @@ class RegisterTests(SimpleTestCase):
 #         self.assertFalse(EmailVerification.objects.filter(user=self.user).exists(),
 #                          'EmailVerification object not deleted')
 
+class AccountEditTests(TestCase):
+    def testEditChanges(self):
+        user, info = test_user()
+        _, change_info = test_user(create=False)
+
+        c = Client()
+        self.assertTrue(c.login(username=info['username'],
+                                password=info['password']), "Can't log in?")
+
+        c.post(reverse('account:edit'), {
+            'email': change_info['email'],
+            'preferred_name': change_info['preferred_name'],
+            'real_name': change_info['real_name'],
+        })
+
+        # refresh the user
+        # user.refresh_from_db() # we don't get this until dj1.8...
+        user = User.objects.get(pk=user.pk)
+        self.assertFalse(user.userdata.email_verified)
+        self.assertTrue(user.emailverification_set.all().exists())
+        self.assertEqual(user.first_name, user.userdata.preferred_name)
+        self.assertEqual(user.last_name, '')
+        self.assertEqual(user.userdata.preferred_name,
+                         change_info['preferred_name'])
+        self.assertEqual(user.userdata.real_name, change_info['real_name'])
+        self.assertEqual(user.email, change_info['email'])
+
+    def testEditRequiresLogin(self):
+        c = Client()
+        resp = c.get(reverse('account:edit'))
+        self.assertEqual(resp.status_code, 302)

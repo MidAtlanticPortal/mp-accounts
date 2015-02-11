@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.conf import settings
 from django.views.generic import RedirectView
+from accounts.views import UserDetailView
 
 _urlpatterns = [
     url('^$', 'accounts.views.index', name='index'),
@@ -9,6 +10,7 @@ _urlpatterns = [
     url('^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/'}, 
         name='logout'), 
     url('^register/$', 'accounts.views.register', name='register'),
+    url('^edit/$', UserDetailView.as_view(), name='edit'),
     url('^forgot/$', 'accounts.views.forgot', name='forgot_password'),
     url('^forgot/(?P<code>[a-f0-9]{32})$', 'accounts.views.forgot_reset', 
         name='forgot_reset'),
