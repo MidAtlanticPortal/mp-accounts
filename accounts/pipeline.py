@@ -33,13 +33,18 @@ def get_social_details(user, backend, response, details, strategy, *args, **kwar
         url = url.get('url')
         if url:
             # The default URL provides an image of size 50, we want size 64
-            # so swap out ?sz=50 with ?sz=64 
+            # so swap out ?sz=50 with ?sz=64
             url = urlparse.urlsplit(url)
-            query = urllib.urlencode({'sz': '64'}) 
+            query = urllib.urlencode({'sz': '64'})
             # reassemble
             url = (url.scheme, url.netloc, url.path, query, url.fragment)
             url = urlparse.urlunsplit(url)
 
+            user.userdata.profile_image = url
+
+    elif backend.name == 'twitter':
+        url = response.get('profile_image_url_https', '')
+        if url:
             user.userdata.profile_image = url
 
     # If this is a new account, set the user's real & preferred names.

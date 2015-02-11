@@ -72,10 +72,9 @@ def login_page(request):
 
     # TODO: Fix the else staircase, refactor this as a FormView
 
-    c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY, 
-             GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
-             next=next_page,
-             form=form)
+    # c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY,
+    #          GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
+    c = dict(next=next_page, form=form)
     
     return render(request, 'accounts/login.html', c)
 
@@ -167,12 +166,17 @@ def social_confirm(request):
 
             return redirect(reverse('social:complete', args=(data['backend'],)))
     else:
-        form = SocialAccountConfirmForm({
+        initial = {
             # create the form with defaults from the auth provider
             'email': data['kwargs']['details'].get('email', ''),
             'real_name': data['kwargs']['details'].get('fullname', ''),
             'preferred_name': data['kwargs']['details'].get('first_name', ''),
-        })
+        }
+        if data.get('backend', '') == 'twitter':
+            twitter_username = data['kwargs']['details'].get('username', '')
+            if twitter_username:
+                initial['preferred_name'] = twitter_username
+        form = SocialAccountConfirmForm(initial)
 
     try:
         name = data['kwargs']['details']['first_name']
