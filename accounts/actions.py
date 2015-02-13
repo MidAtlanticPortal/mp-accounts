@@ -43,7 +43,8 @@ def nice_provider_name(user):
     
     return {
         'google-plus': "Google",
-        'facebook': "Facebook"
+        'facebook': "Facebook",
+        'twitter': "Twitter",
     }[backend]
 
 

@@ -15,6 +15,11 @@ class EmailVerification(models.Model):
     activate_user = models.BooleanField(default=True, 
         help_text=("If true, user.is_active will be set to true when verified."))
 
+    def __str__(self):
+        return "Verification, uid=%s, email=%s, when=%s" % (self.user.pk,
+                                                            self.email_to_verify,
+                                                            self.created)
+
     def save(self, *args, **kwargs):
         self.verification_code = uuid.uuid4().hex
         return super(EmailVerification, self).save(*args, **kwargs)
