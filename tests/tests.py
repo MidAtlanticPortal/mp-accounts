@@ -11,6 +11,8 @@ import re
 from accounts.models import EmailVerification, UserData
 from django.test.testcases import SimpleTestCase
 from django.utils.crypto import get_random_string
+import urllib
+from bs4 import BeautifulSoup
 
 def test_user(create=True, username=None, password=None,
               preferred_name=None, real_name=None, email=None):
@@ -58,6 +60,15 @@ class AccountIndexTest(SimpleTestCase):
         r = c.get('/account/')
         self.assertEqual(r.status_code, 200)
         self.assertTrue('login.html' in r.templates[0].name)
+
+    def testFormPreservesNextParam(self):
+        p1, p2 = '/account/?next=', '/foo/#bar'
+        path = p1 + urllib.quote_plus(p2)
+
+        request = self.client.get(path)
+        action = BeautifulSoup(request.content).form['action']
+
+        self.assertEqual(action, path)
 
     def testUserGetsAccountPage(self):
         c = Client()
