@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required
+from urllib import quote
 
 from models import EmailVerification
 from forms import SignUpForm, ForgotPasswordForm,\
@@ -74,7 +75,7 @@ def login_page(request):
 
     # c = dict(GPLUS_ID=settings.SOCIAL_AUTH_GOOGLE_PLUS_KEY,
     #          GPLUS_SCOPE=' '.join(settings.SOCIAL_AUTH_GOOGLE_PLUS_SCOPES),
-    c = dict(next=next_page, form=form)
+    c = dict(next=quote(next_page), form=form)
     
     return render(request, 'accounts/login.html', c)
 

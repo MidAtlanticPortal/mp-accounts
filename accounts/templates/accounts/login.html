@@ -62,7 +62,7 @@ function googlePlusSignIn(authResult) {
     <div>
         <br />
         <br />
-        <form class="login-form" method="POST" action="{% url 'account:index' %}">
+        <form class="login-form" method="POST" action="{% url 'account:index' %}{% if next %}?next={{ next }}{% endif %}">
             <style>
             .login-form {
                 margin-bottom: 1em;
