@@ -66,6 +66,13 @@ class AccountIndexTest(SimpleTestCase):
         r = c.get('/account/')
 #         self.assertTrue('index.html' in r.templates[0].name)
     
+    def testLocalLogInRedirect(self):
+        c = Client()
+        response = c.post('/account/?next=/foo/', {
+            'email': self.userinfo['email'],
+            'password': self.userinfo['password']
+        })
+        self.assertRedirects(response, '/foo/', status_code=302, target_status_code=200)
 
 class ForgotPasswordTests(TestCase):
     def setUp(self):
