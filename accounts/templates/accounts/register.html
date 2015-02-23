@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+{% if not not_recaptch %}
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 
 <script>
@@ -11,33 +17,34 @@
     <div>
         <form class="login-form" method="POST" action="{% url 'account:register' %}">
             <style>
-            .login-form {
-                margin-bottom: 1em;
-            }
-            .login-form > div {
-                width: 30em;
-                margin: 0 auto; 
-            }
-            .login-form div + div {
-                padding-top: 1ex;
-            }
-            .login-form .form-control {
-                color: black;
-            }
+            .login-form { margin-bottom: 1em; }
+            .login-form > div { width: 30em; margin: 0 auto; }
+            .login-form div + div { padding-top: 1ex; }
+            .login-form .form-control { color: black; }
             .login-form .left-inner-addon { position: relative; }
             .login-form .left-inner-addon input { padding-left: 30px; }
             .login-form .left-inner-addon i { 
                 position: absolute; padding: 10px 12px; cursor: default;
             }
+            div.g-recaptcha {
+                padding-top: 2ex;
+                width: 30ex;
+            }
             </style>
             {% csrf_token %}
             
-            <hr />
             {{ form.as_div }}
-            <hr />
-            
-            <div>
-                <button onclick='this.form.submit()'>Sign up &rarr;</button>
+
+            {% if not not_recaptcha %}
+            <div style="">
+                <div class="g-recaptcha"
+                     data-sitekey="6LdhjQATAAAAAJaRaUqkauCBPH1ur09F4RXy-GFv"></div>
+            </div>
+            {% endif %}
+
+            <div style="padding-top: 1em; text-align: center;">
+                <button class="btn btn-primary btn-lg"
+                        type="submit">Sign up &rarr;</button>
             </div>
         </form>
     </div>
