@@ -1,59 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/x-scss" href="{% static 'accounts/accounts.scss' %}" />
+{% endblock %}
 
 {% block content %}
-
-{% comment %}
-<script>
-var gplusButtonCreated = false;
-window.setTimeout(function() {
-    console.log("gplus button?", gplusButtonCreated)
-}, 5000);
-window.onbeforeunload = function() {
-    gapi.auth.signOut();
-}
-//** Create the button
-function gplusButton() {
-    gplusButtonCreated = true;
-    var b = document.getElementById('signinButton');
-    gapi.signin.render(b, {
-            clientid: '{{ GPLUS_ID }}',
-            scope: '{{ GPLUS_SCOPE }}',
-            cookiepolicy: 'single_host_origin', 
-            callback: 'googlePlusSignIn',
-            requestvisibleactions: 'http://schema.org/AddAction http://schema.org/CommentAction'
-    });
-}
-
-function googlePlusSignIn(authResult) {
-    console.log("G+ Auth result", authResult);
-
-    if (authResult['status']['method'] == 'AUTO') {
-        console.log("You were automatically logged in")
-    }
-    else if (authResult['status']['signed_in']) {
-        console.info("G+ Sign-In succeeded because", authResult.status.method);
-        document.getElementById('signinButton').setAttribute('style', 'display: none;');
-        document.getElementById('code').setAttribute('value', authResult['code']);
-        document.getElementById('at').setAttribute('value', authResult['access_token']);
-        document.getElementById('googlePlusSignInForm').submit()
-    }
-    else if (authResult['status']['google_logged_in']) {
-        console.log("You are logged in to google already.")
-    }
-    else {
-        console.error("G+ Sign-In other error", authResult.error, 
-                      authResult.error_subtype);
-    }
-}
-
-</script>
-{% endcomment %}
-
-<script src="https://apis.google.com/js/client:platform.js?onload=gplusButton" async defer></script>
-
-<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
+<div class="login">
     
-    <h2 style="text-align: center;">Log in.</h2>
+    <h2>Log in.</h2>
     
     <p>Anyone can join the MARCO Portal&mdash;<a href="{% url 'account:register' %}">becoming a member</a> allows you 
     to join and create interest groups, custom data layers, and share 
@@ -63,84 +18,38 @@ function googlePlusSignIn(authResult) {
         <br />
         <br />
         <form class="login-form" method="POST" action="{% url 'account:index' %}{% if next %}?next={{ next }}{% endif %}">
-            <style>
-            .login-form {
-                margin-bottom: 1em;
-            }
-            .login-form > div {
-                width: 30em;
-                margin: 0 auto; 
-            }
-            .login-form div + div {
-                padding-top: 1ex;
-            }
-            .login-form .form-control {
-                color: black;
-            }
-            .login-form .left-inner-addon { position: relative; }
-            .login-form .left-inner-addon input { padding-left: 30px; }
-            .login-form .left-inner-addon i { 
-                position: absolute; padding: 10px 12px; cursor: default;
-            }
-            </style>
                 {% csrf_token %}
 
                 {{ form.as_div }}
 
 
-                <div>
-                    <button onclick='this.form.submit()'>Log in &rarr;</button>
-                </div>
-                
-                <script>
-                function click_i() { console.log("you clicked", this); };
-                var elements = document.querySelectorAll('.login-form i.fa');
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].addEventListener('click', click_i);
-                }
-                </script>
+            <div class="social-login">
+                or log in with
+                <a class="fa-stack fa-lg" href="https://twitter.com/PortalMARCO">
+                    <i class="fa fa-circle fa-stack-2x green"></i>
+                    <i class="fa fa-twitter fa-stack-1x white"></i>
+                </a>
+
+                <a class="fa-stack fa-lg" href="https://twitter.com/PortalMARCO">
+                    <i class="fa fa-circle fa-stack-2x green"></i>
+                    <i class="fa fa-facebook fa-stack-1x white"></i>
+                </a>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-success btn-lg" onclick='this.form.submit()'>Log in &rarr;</button>
+            </div>
         </form>
     </div>
 
-
-    <div style="position: relative; width: 250px; margin: 0 auto;
-                border-radius: 8px; padding: 1em 1em 0.5em 1em;
-                background-color: rgba(0, 0, 0, 0.0625);">
-
-        <div style="margin-bottom: 1ex; height: 3em;">
-            <div style="border-radius: 6px; padding: 0.5em 0.5em; background-image: -webkit-linear-gradient(top, rgb(76, 105, 186), rgb(59, 85, 160)); background-image: -moz-linear-gradient(top, rgb(76, 105, 186), rgb(59, 85, 160));">
-                <a style="font-family: Helvetica, Arial; color: white; display: block;" href="{% url 'social:begin' 'facebook' %}?next={{ next }}"> 
-                    <i class="fa fa-2x fa-facebook-square" style="margin-top: -3px; float:left"></i>
-                    <span style="margin-left: 0.75em;"> Sign in with <b>Facebook</b></span>
-                </a>
-            </div>
-        </div>
-
-        <div style="height: 3em;">
-            <div style="border-radius: 6px; padding: 0.5em 0.5em;
-                        background-image: -webkit-linear-gradient(top, rgb(108, 182, 240), rgb(85, 172, 240));
-                        background-image: -moz-linear-gradient(top, rgb(108, 182, 240), rgb(85, 172, 240));">
-                <a style="font-family: Helvetica, Arial; color: white; display: block;" href="{% url 'social:begin' 'twitter' %}?next={{ next }}">
-                    <i class="fa fa-2x fa-twitter-square" style="margin-top: -3px; float:left"></i>
-                    <span style="margin-left: 0.75em;"> Sign in with <b>Twitter</b></span>
-                </a>
-            </div>
-        </div>
-
-        {% comment %}
-        <div style="height: 3em;">
-            <form id="googlePlusSignInForm" method="post" action="{% url 'social:complete' 'google-plus' %}?next={{ next }}">
-                {% csrf_token %}
-                <input id="at" type="hidden" name="access_token" value="" />
-                <input id="code" type="hidden" name="code" value="" />
-            </form>
-
-            <div id="signinButton"></div>
-        </div>
-        {% endcomment %}
+    <div>
+        <br />
+        <br />
+        <p class="text-center">
+            <a href="{% url 'account:forgot_password' %}">I forgot my password</a>
+            &bull; <a href="{% url 'account:register' %}">I need to register</a>
+        </p>
     </div>
-    
-    <p style="margin-top: 1em; text-align: center"><a href="{% url 'account:forgot_password' %}">I forgot my password</a> &bull; <a href="{% url 'account:register' %}">I need to register</a></p>
 
 </div>
 
