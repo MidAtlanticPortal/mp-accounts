@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from urllib import quote
 
 from models import EmailVerification
@@ -287,6 +287,22 @@ def all_logged_in_users():
                 users.append({'user': user_obj[0], 'until': session.expire_date})
     
     return users
+
+
+@user_passes_test(lambda x: x.is_superuser)
+def debug_page(request):
+    """Serve up the primary account view, or the login view if not logged in
+    """
+    if request.user.is_anonymous():
+        return login_page(request)
+
+    c = {}
+
+    if settings.DEBUG:
+        c['users'] = get_user_model().objects.all()
+        c['sessions'] = all_logged_in_users()
+
+    return render(request, 'accounts/debug.html', c)
 
 
 def forgot(request): 

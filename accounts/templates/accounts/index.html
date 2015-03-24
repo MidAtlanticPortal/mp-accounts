@@ -4,47 +4,6 @@
 
 <h3>Hello, {{ user.first_name }}. </h3>
 
-<div style="width: 50%; float: right;">
-    <style>
-        dt {
-            float:left;
-            clear:left;
-            text-align: right;
-            width: 120px;
-        }
-        dt:after {
-            content: ": ";
-        }
-        dd {
-            margin: 0 0 0 125px;
-            padding: 0 0 0 0;
-        }
-
-    </style>
-    All Users:<br />
-    <ol>
-    {% for u in users %}
-        <li>
-            <dl>
-                <dt>preferred name</dt><dd>&ldquo;{{ u.get_short_name }}&rdquo; (id={{u.pk}})</dd>
-                <dt>name</dt><dd>&ldquo;{{ u.get_full_name }}&rdquo;</dd>
-                <dt>email</dt>
-                    <dd>{{ u.email }}</dd>
-                <dt>auth provider</dt>
-                    <dd>{% for provider in u.social_auth.all %}{{ provider.provider }}{% empty %}django{% endfor %}</dd>
-            </dl>
-        </li>
-    {% endfor %}
-    </ol>
-    <hr/>
-    Active sessions:<br/> 
-    {% for session in sessions %}
-    {{ session.user }} until {{ session.until|date:"r" }}<br />
-    {% empty %}
-    No active sessions<br/>
-    {% endfor %}
-</div>
-
 <script>
 function signOut()
 {

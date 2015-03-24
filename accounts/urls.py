@@ -26,6 +26,7 @@ _urlpatterns = [
 if settings.DEBUG:
     _urlpatterns.extend([
         url('^promote-user$', 'accounts.views.promote_user'),
+        url('^debug$', 'accounts.views.debug_page')
     ])
 
 
