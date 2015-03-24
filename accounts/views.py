@@ -29,9 +29,11 @@ def index(request):
     
     c = {}
 
-    if settings.DEBUG:
-        c['users'] = get_user_model().objects.all()
-        c['sessions'] = all_logged_in_users()
+    user = request.user
+    if getattr(user, 'social_auth', None) and user.social_auth.exists():
+        c['can_change_password'] = False
+    else:
+        c['can_change_password'] = True
 
     return render(request, 'accounts/index.html', c)
 
