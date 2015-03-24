@@ -1,7 +1,7 @@
 from django import forms
 from widgets import BSLeftIconTextInput, BSLeftIconPasswordInput,\
     BSLeftIconEmailInput
-from django.contrib.auth import get_user_model 
+from django.contrib.auth import get_user_model, authenticate
 from models import PasswordDictionary
 from django.core.exceptions import ValidationError
 
@@ -117,7 +117,55 @@ class ResetPasswordForm(DivForm):
             self.add_error("password2", msg)
 
         return cleaned_data
-    
+
+
+class ChangePasswordForm(DivForm):
+    """Form to change passwords.
+    Special, as it requires a logged in user, and the current request passed
+    to the constructor.
+    """
+    current_password = forms.CharField(min_length=6, max_length=100,
+                                       widget=l_icon_pw('fa fa-unlock-alt', 'Current Password'),
+                                       label="Current Password")
+    password1 = forms.CharField(min_length=6, max_length=100,
+                                widget=l_icon_pw('fa fa-unlock-alt', 'new password'),
+                                validators=[password_dictionary_validator],
+                                label="New password")
+    password2 = forms.CharField(min_length=6, max_length=100,
+                                widget=l_icon_pw('fa fa-unlock-alt', 'new password again'),
+                                label="Confirm your new password")
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        """Raise a validation error if the passwords do not match.
+        """
+        cleaned_data = super(ChangePasswordForm, self).clean()
+
+        current_password = cleaned_data.get('current_password')
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+
+        result = authenticate(password=current_password,
+                              username=self.request.user.username)
+        if not result:
+            msg = u"Your current password is incorrect."
+            self.add_error('current_password', msg)
+            return cleaned_data
+
+        if current_password == password1:
+            msg = (u"Please choose a password that is different "
+                   u"from your current password.")
+            self.add_error('password1', msg)
+
+        elif password1 != password2:
+            msg = u"Your passwords do not match."
+            self.add_error("password2", msg)
+
+        return cleaned_data
+
 
 class SocialAccountConfirmForm(DivForm):
     """A form that allows the user to enter some of their pertinant details

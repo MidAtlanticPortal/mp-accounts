@@ -14,7 +14,8 @@ from urllib import quote
 
 from models import EmailVerification
 from forms import SignUpForm, ForgotPasswordForm,\
-    ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm
+    ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm, \
+    ChangePasswordForm
 from actions import apply_user_permissions, send_password_reset_email,\
     send_social_auth_provider_login_email, generate_username
 from nursery.view_helpers import decorate_view
@@ -114,6 +115,37 @@ class UserDetailView(FormView):
 
         if do_verification:
             verify_email_address(self.request, u, activate_user=False)
+
+        return super(FormView, self).form_valid(form)
+
+
+@decorate_view(login_required)
+class ChangePasswordView(FormView):
+    template_name = 'accounts/change_password_form.html'
+    form_class = ChangePasswordForm
+    success_url = reverse_lazy('account:index')
+
+    def get_initial(self):
+        return {
+            'current_password': '',
+            'password1': '',
+            'password2': '',
+        }
+
+    def get_form_kwargs(self):
+        """Stuff the current request into the form.
+        """
+        kwargs = super(ChangePasswordView, self).get_form_kwargs()
+
+        # Because this is a password form, we need access to the user & request
+        # to verify that everything's ok.
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        u = self.request.user
+        u.set_password(form.cleaned_data['password1'])
+        u.save()
 
         return super(FormView, self).form_valid(form)
 

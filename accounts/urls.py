@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.conf import settings
 from django.views.generic import RedirectView
-from accounts.views import UserDetailView
+from accounts.views import UserDetailView, ChangePasswordView
 
 _urlpatterns = [
     url('^$', 'accounts.views.index', name='index'),
@@ -20,6 +20,8 @@ _urlpatterns = [
         name='verify_new_email'),
     url('^verify/(?P<code>[a-f0-9]{32})$', 'accounts.views.verify_email', 
         name='verify_email'),
+    url('^change-password/$', ChangePasswordView.as_view(),
+        name='change_password'),
 ]
 
 
