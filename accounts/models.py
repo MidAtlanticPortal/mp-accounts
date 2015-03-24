@@ -40,6 +40,9 @@ class UserData(models.Model):
 
     show_real_name_by_default = models.BooleanField(default=False)
 
+    def __str__(self):
+        return "UserData for %s" % self.real_name
+
     def save(self, *args, **kwargs):
         self.user.first_name = self.preferred_name
         self.user.last_name = ''

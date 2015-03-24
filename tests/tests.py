@@ -8,6 +8,7 @@ from django.test.client import Client
 from django.core import mail
 from django.core.mail import mail_admins
 import re
+from accounts.forms import ChangePasswordForm
 from accounts.models import EmailVerification, UserData
 from django.test.testcases import SimpleTestCase
 from django.utils.crypto import get_random_string
@@ -64,7 +65,7 @@ class AccountIndexTest(SimpleTestCase):
     def testFormPreservesNextParam(self):
         p1, p2 = '/account/?next=', '/foo/#bar'
         path = p1 + urllib.quote_plus(p2)
-
+        path = path.replace('%2F', '/') # close, but no cigar
         request = self.client.get(path)
         action = BeautifulSoup(request.content).form['action']
 
@@ -148,6 +149,61 @@ class ForgotPasswordTests(TestCase):
         
         # Trying to remember a password while logged in should get you bounced.
         self.assertTrue(resp.status_code, 301)
+
+
+class ChangePasswordTests(TestCase):
+    def setUp(self):
+        self.pw1 = 'a$b$c$d'
+        self.pw2 = 'w!x!y!z'
+
+        self.user, self.userinfo = test_user(password=self.pw1)
+
+    def testChangePasswordLoggedOut(self):
+        c = Client()
+        r = c.get(reverse('account:change_password'))
+        self.assertEqual(r.status_code, 302, "change password didn't redirect to login" )
+
+    def testChangePasswordWrong(self):
+        c = Client()
+
+        # make sure we can log in:
+        self.assertTrue(c.login(username=self.userinfo['username'],
+                                password=self.pw1))
+
+        url = reverse('account:change_password')
+        r = c.get(url)
+        self.assertEqual(r.status_code, 200)
+
+        # don't change password to the current_password
+        r = c.post(url, {'current_password': self.pw1, 'password1': self.pw1,
+                         'password2': self.pw1})
+        self.assertFormError(r, 'form', 'password1', 'Please choose a password that is different from your current password.')
+
+        # make sure pw1 and 2 match
+        r = c.post(url, {'current_password': self.pw1, 'password1': self.pw2,
+                         'password2': self.pw1})
+        self.assertFormError(r, 'form', 'password2', 'Your passwords do not match.')
+
+    def testChangePassword(self):
+        c = Client()
+
+        # make sure we can log in:
+        self.assertTrue(c.login(username=self.userinfo['username'],
+                                password=self.pw1))
+
+        url = reverse('account:change_password')
+        r = c.get(url)
+        self.assertEqual(r.status_code, 200)
+
+        r = c.post(url, {'current_password': self.pw1, 'password1': self.pw2,
+                         'password2':self.pw2})
+        self.assertEqual(r.status_code, 302)
+
+        c.logout()
+
+        # make sure we can log in with the new password
+        self.assertTrue(c.login(username=self.userinfo['username'],
+                                password=self.pw2))
 
 
 class RegisterTests(SimpleTestCase):

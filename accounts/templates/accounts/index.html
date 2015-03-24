@@ -4,61 +4,12 @@
 
 <h3>Hello, {{ user.first_name }}. </h3>
 
-<div style="width: 50%; float: right;">
-    <style>
-        dt {
-            float:left;
-            clear:left;
-            text-align: right;
-            width: 120px;
-        }
-        dt:after {
-            content: ": ";
-        }
-        dd {
-            margin: 0 0 0 125px;
-            padding: 0 0 0 0;
-        }
-
-    </style>
-    All Users:<br />
-    <ol>
-    {% for u in users %}
-        <li>
-            <dl>
-                <dt>preferred name</dt><dd>&ldquo;{{ u.get_short_name }}&rdquo; (id={{u.pk}})</dd>
-                <dt>name</dt><dd>&ldquo;{{ u.get_full_name }}&rdquo;</dd>
-                <dt>email</dt>
-                    <dd>{{ u.email }}</dd>
-                <dt>auth provider</dt>
-                    <dd>{% for provider in u.social_auth.all %}{{ provider.provider }}{% empty %}django{% endfor %}</dd>
-            </dl>
-        </li>
-    {% endfor %}
-    </ol>
-    <hr/>
-    Active sessions:<br/> 
-    {% for session in sessions %}
-    {{ session.user }} until {{ session.until|date:"r" }}<br />
-    {% empty %}
-    No active sessions<br/>
-    {% endfor %}
-</div>
-
-<script>
-function signOut()
-{
-    location.href = "{% url 'account:logout' %}";
-}
-</script>
-
 <div style="width: 64px; height: 64px; overflow: hidden; border: 1px solid #999; background-color: rgba(0, 0, 0, 0.125)">
 <img width=64 height=64 src="{{ user.userdata.profile_image }}" />
 </div>
 Would you like to
-<button onclick='signOut()'>Log out?</button><br />
+<a class="btn btn-default" href="{% url 'account:logout' %}">Log out?</a><br />
 
-username: {{ user.username }}<br/>
 {# groups: {% for g in user.groups.all %}{{ g.name }}{% empty %}Not a member of any groups{% endfor %}<br/> #}
 {# provider: {% for provider in user.social_auth.all %}{{ provider.provider }}{% endfor %}<br/> #}
 Name: {{ user.get_full_name }}<br/>
@@ -69,7 +20,6 @@ email: {{ user.email|default:"<i style='color:red'>No Email Address</i>" }}
     <button onclick="this.form.submit()">Verify email</button>
 </form>{% endif %}<br/>
 
-<a href="{% url 'account:edit' %}">Edit my info</a>
 Member since: {{ user.date_joined|date }}<br/>
 
 Map Group membership:
@@ -78,4 +28,14 @@ Map Group membership:
     <li><a href="{{ membership.map_group.get_absolute_url }}">{{ membership.map_group.name }}</a></li>
     {% endfor %}
 </ul>
+
+<a class="btn btn-default" href="{% url 'account:edit' %}">Edit my info</a>
+<a class="btn btn-default" href="{% url 'account:change_password' %}">Change my password</a>
+
+{% if user.is_superuser %}
+    <a class="btn btn-default" href="/django-admin">Go to the Django admin page</a>
+{% endif %}
+{% if user.is_staff %}
+    <a class="btn btn-default" href="/admin">Go to the CMS admin page</a>
+{% endif %}
 {% endblock %}
