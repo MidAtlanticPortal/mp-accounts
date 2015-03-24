@@ -65,7 +65,7 @@ class AccountIndexTest(SimpleTestCase):
     def testFormPreservesNextParam(self):
         p1, p2 = '/account/?next=', '/foo/#bar'
         path = p1 + urllib.quote_plus(p2)
-
+        path = path.replace('%2F', '/') # close, but no cigar
         request = self.client.get(path)
         action = BeautifulSoup(request.content).form['action']
 
