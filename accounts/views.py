@@ -58,7 +58,12 @@ def login_page(request):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                return render(request, 'accounts/invalid_credentials.html')
+                form = LogInForm()
+                form.cleaned_data = {}
+
+                form.add_error('email', "Your user does not exist")
+                c = dict(next=quote(next_page), form=form)
+                return render(request, 'accounts/login.html', c)
 
             user = authenticate(username=user.username, password=p)
             if user is not None:
@@ -66,11 +71,27 @@ def login_page(request):
                     login(request, user)
                     return HttpResponseRedirect(next_page)
                 else:
-                    return render(request, 'accounts/invalid_credentials.html')
+                    form = LogInForm()
+                    form.cleaned_data = {}
+
+                    form.add_error('email', "Your email address is incorrect")
+                    form.add_error('password', "Your password is incorrect")
+                    c = dict(next=quote(next_page), form=form)
+                    return render(request, 'accounts/login.html', c)
             else:
-                return render(request, 'accounts/invalid_credentials.html')
+                form = LogInForm()
+                form.cleaned_data = {}
+
+                form.add_error('email', "Your user does not exist")
+                c = dict(next=quote(next_page), form=form)
+                return render(request, 'accounts/login.html', c)
         else:
-            return render(request, 'accounts/invalid_credentials.html')
+            form = LogInForm()
+            form.cleaned_data = {}
+
+            form.add_error('email', "Please try again")
+            c = dict(next=quote(next_page), form=form)
+            return render(request, 'accounts/login.html', c)
     else:
         form = LogInForm()
 

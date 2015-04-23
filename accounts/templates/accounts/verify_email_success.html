@@ -2,8 +2,11 @@
 
 {% block content %}
 
-Your email has been verified successfully. <br />
-
-You may now <a href="{% url 'account:index' %}">Log In</a>.
+<div style="padding-top: 4em">
+	<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
+	    <h3 style="text-align: center;">Your email has been verified successfully.</h3>
+	    <h5 style="text-align: center;">You may now <a href="{% url 'account:index' %}">Log In</a>.</h5>
+	</div>
+</div>
 
 {% endblock %}
