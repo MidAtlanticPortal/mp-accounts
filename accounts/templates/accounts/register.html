@@ -1,7 +1,6 @@
-{% extends "base.html" %}
 
 {% block content %}
-
+{% if not user.is_authenticated %}
 <script>
 </script>
 
@@ -42,9 +41,10 @@
         </form>
     </div>
 
-    <p style="text-align: center"><a href="">I forgot my password</a></p>
+    <p style="text-align: center"><a href="{% url 'account:forgot_password' %}">I forgot my password</a></p>
 
 </div>
 
-
+{% endif %}
 {% endblock %}
+
