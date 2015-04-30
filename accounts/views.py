@@ -206,7 +206,7 @@ def register(request):
             apply_user_permissions(user)
             verify_email_address(request, user)
             
-            return render(request, 'accounts/check_your_email.html')
+            return HttpResponseRedirect('/slug/')
     else:
         form = SignUpForm()
 

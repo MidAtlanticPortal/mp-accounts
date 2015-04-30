@@ -1,11 +1,13 @@
-{% extends "base.html" %}
+{% if '/join/' in request.path %}
 
-{% block content %}
+	{% block content %}
 
-<div style="padding-top: 4em">
-	<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
-	    <h3 style="text-align: center;">Check your email for a verification link to continue registration. </h3>
+	<div style="padding-top: 1em">
+		<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
+		    <h4 style="text-align: center;">Check your email for a verification link to continue registration. </h3>
+		</div>
 	</div>
-</div>
 
-{% endblock %}
+	{% endblock %}
+	
+{% endif %}
