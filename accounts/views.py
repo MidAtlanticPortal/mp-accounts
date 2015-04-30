@@ -206,7 +206,7 @@ def register(request):
             apply_user_permissions(user)
             verify_email_address(request, user)
             
-            return HttpResponseRedirect('/slug/')
+            return HttpResponseRedirect('/join/')
     else:
         form = SignUpForm()
 
