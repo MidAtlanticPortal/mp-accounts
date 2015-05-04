@@ -1,6 +1,8 @@
+{% extends "base.html" %}
 
 {% block content %}
-{% if not user.is_authenticated %}
+{% load welcome_entry %}
+{% welcome_entry %}
 <script>
 </script>
 
@@ -8,7 +10,7 @@
     <h2 style="text-align: center;">Sign Up</h2>
     <p style="text-align: center">(All fields are required)</p>
     <div>
-        <form class="login-form" method="POST" action="{% url 'account:register' %}">
+        <form class="login-form" id="register-form" method="POST" action="{% url 'account:register' %}">
             <style>
             .login-form {
                 margin-bottom: 1em;
@@ -45,6 +47,4 @@
 
 </div>
 
-{% endif %}
 {% endblock %}
-
