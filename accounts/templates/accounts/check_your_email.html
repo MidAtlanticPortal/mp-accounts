@@ -1,9 +1,11 @@
-{% if user.is_active and user.userdata.email_verified == false %}
-	{% block content %}
+{% extends "base.html" %}
+{% block content %}
 
-	<div style="border: 1px solid blue; margin: 1em 1em; padding: 1em; display: block; margin-right: auto; margin-left: auto; width: 65%;">
-	    <h4 style="text-align: center;">Check your email for a verification link to continue registration. </h3>
-	</div>
+<div style="border: 1px solid blue; margin: 1em 1em; padding: 1em; display: block; margin-right: auto; margin-left: auto; width: 65%; margin-bottom: 50px;">
+    <h4 style="text-align: center;">Check your email for a verification link to continue registration. </h3>
+</div>
 
-	{% endblock %}
-{% endif %}
+{% load welcome_entry %}
+{% welcome_entry %}
+{% endblock %}
+
