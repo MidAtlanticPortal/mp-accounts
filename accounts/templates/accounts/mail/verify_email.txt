@@ -1,13 +1,53 @@
-Dear {{ name }},
+
+Welcome {{ name}}!
+
+Thank you for joining the Mid-Atlantic Ocean Data Portal!
 
 Please copy and paste this url into your browser to validate your email address.
 
     {{ url }}
 
-If you did not request this, then no action is required.
+Log in today to access the best available data on ocean science through a state-of-the art data visualization, storytelling, and a networking platform that connects you to agency, industry, and community leaders who are shaping the future of our ocean. Use these quick tips to get started:
 
-Regards, 
 
-MARCO Portal Team
-info@ < marco portal web site >
-http://midatlanticoceans.org
+
+MAKE A MAP.
+
+Marine Planner is a powerful data visualization tool that helps you make maps of your own in no time – just select any of the data layers to see how different ocean uses intersect. As a registered user, you can customize, save, share and export your maps.
+
+Take me to Marine Planner [http://midatlantic.point97.io/visualize/#x=-73.24&y=38.93&z=7&logo=true&controls=true&basemap=Ocean&tab=data&legends=false&layers=true] 
+
+
+
+COLLABORATE.
+
+Network with your Portal community through map groups.
+
+Invite your colleagues to illustrate ocean uses, find compatibilities, and reduce ocean conflict. The mapping projects you create together can be saved and shared with other group members or other registered Portal users, publicly or privately.
+
+Explore map groups [http://midatlantic.point97.io/g] 
+
+
+
+KEEP EXPLORING. 
+
+We'll update the Portal as ocean use data emerges and conflicts and collaborations surface.
+
+Stay up to date with these training opportunities >>>
+
+1. How Tuesday
+
+Held the first Tuesday of each month at 2pm, this live webinar invites users of all skill levels and backgrounds to come together and learn more about Portal navigation and resources.
+
+Sign up [http://midatlantic.point97.io/account/register/] 
+
+
+2. Group training
+
+Perfect for any agency or organization, we offer half- and full-day training sessions to gather your team or task force around the Portal in support of your ocean planning efforts.
+
+Learn more [http://midatlantic.point97.io/how-use-our-tools/schedule-group-training/]
+
+
+
+portal@midatlanticocean.com 
