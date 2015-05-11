@@ -206,7 +206,7 @@ def register(request):
             apply_user_permissions(user)
             verify_email_address(request, user)
             
-            return render(request, 'welcome_snippet/welcome_landing_page.html')
+            return render(request, 'accounts/check_your_email.html')
     else:
         form = SignUpForm()
 
