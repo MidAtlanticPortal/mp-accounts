@@ -7,10 +7,10 @@
 </script>
 
 <div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
-    <h2 style="text-align: center;">Sign Up</h2>
+    <h2 id="form-begin" style="text-align: center;">Sign Up</h2>
     <p style="text-align: center">(All fields are required)</p>
     <div>
-        <form class="login-form" id="register-form" method="POST" action="{% url 'account:register' %}">
+        <form class="login-form" id="register-form" method="POST" action="{% url 'account:register' %}#form-begin">
             <style>
             .login-form {
                 margin-bottom: 1em;
@@ -37,7 +37,7 @@
             {{ form.as_div }}
             <hr />
             
-            <div>
+            <div style="text-align: center;">
                 <button class='btn btn-success' onclick='this.form.submit()'>Sign up &rarr;</button>
             </div>
         </form>

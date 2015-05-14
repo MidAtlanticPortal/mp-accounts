@@ -51,10 +51,10 @@ class DivForm(forms.Form):
     
 class SignUpForm(DivForm):
     real_name = forms.CharField(min_length=3, max_length=100,
-                                widget=l_icon('fa fa-info', 'real name'))
+                                widget=l_icon('fa fa-info', 'first and last name'), label="First and Last Name")
 
     preferred_name = forms.CharField(min_length=2, max_length=100,
-                                     widget=l_icon('fa fa-info', 'preferred name'))
+                                     widget=l_icon('fa fa-info', 'preferred name'), label="Preferred Name")
 
     # hide_real_name = forms.BooleanField()
 
