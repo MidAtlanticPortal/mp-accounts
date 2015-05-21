@@ -124,7 +124,7 @@ class ChangePasswordForm(DivForm):
     Special, as it requires a logged in user, and the current request passed
     to the constructor.
     """
-    current_password = forms.CharField(min_length=6, max_length=100,
+    current_password = forms.CharField(min_length=1, max_length=100,
                                        widget=l_icon_pw('fa fa-unlock-alt', 'Current Password'),
                                        label="Current Password")
     password1 = forms.CharField(min_length=6, max_length=100,
