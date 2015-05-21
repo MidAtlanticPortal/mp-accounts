@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.views.generic import FormView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
@@ -288,12 +289,23 @@ def social_confirm(request):
 def verify_email_address(request, user, activate_user=True):
     """Verify a user's email address. Typically during registration or when
     an email address is changed.
+
+    Verifications may be sent at most once per 2 hour period (long enough so
+    that a frustrated user will give up if they didn't get the email). This is
+    done to prevent our mail sender from being blacklisted.
     """
 
-    e = EmailVerification()
-    e.user = user
-    e.email_to_verify = user.email
-    e.activate_user = activate_user
+    e, created = EmailVerification.objects.get_or_create(user=user)
+    if created:
+        e.email_to_verify = user.email
+        e.activate_user = activate_user
+        e.save()
+    else:
+        # Send the verification email again, but only if it's been a while.
+        if timezone.now() - e.created < timedelta(hours=2):
+            return
+        e.created = timezone.now() # reset the creation date
+
     e.save()
     send_verification_email(request, e)
 

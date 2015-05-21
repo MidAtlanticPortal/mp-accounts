@@ -1,4 +1,5 @@
-import random 
+import random
+import datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -289,8 +290,6 @@ class RegisterTests(SimpleTestCase):
         self.assertFalse(u.userdata.email_verified, 'user was created with a verified email address')
         self.assertTrue(u.emailverification_set.all().exists(), 'user ev was not created')
         
-#         self.assertFalse(EmailVerification.objects.filter(user=self.user).exists(),
-#                          'EmailVerification object not deleted')
 
 class AccountEditTests(TestCase):
     def testEditChanges(self):
@@ -323,3 +322,32 @@ class AccountEditTests(TestCase):
         c = Client()
         resp = c.get(reverse('account:edit'))
         self.assertEqual(resp.status_code, 302)
+
+    def testVerificationThrottle(self):
+        """Test that the email verification throttle works
+        """
+        user, info = test_user()
+        c = Client()
+        self.assertTrue(c.login(username=info['username'],
+                                password=info['password']))
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        # this should send us a reset link, and generate an EmailVerification
+        c.post(reverse('account:verify_new_email'), {})
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertTrue(EmailVerification.objects.filter(user=user).exists())
+
+        # the second time, nothing should happen
+        c.post(reverse('account:verify_new_email'), {})
+        self.assertEqual(len(mail.outbox), 1)
+
+        # "Wait" a few hours by making the ev look like it was created a few hours ago
+        ev = EmailVerification.objects.get(user=user)
+        ev.created = datetime.datetime.now() - datetime.timedelta(hours=2, seconds=1)
+        ev.save()
+
+        # and now, the third request will get another email
+        c.post(reverse('account:verify_new_email'), {})
+        self.assertEqual(len(mail.outbox), 2)
+
