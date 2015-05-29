@@ -2,11 +2,12 @@
 
 {% block content %}
 
-<div style="padding-top: 4em">
-	<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
-	    <h3 style="text-align: center;">Your email has been verified successfully.</h3>
-	    <h5 style="text-align: center;">You may now <a href="{% url 'account:index' %}">Log In</a>.</h5>
+	<div style="border: 1px solid blue; margin: 1em 1em; padding: 1em; display: block; margin-right: auto; margin-left: auto; width: 55%; margin-bottom: 50px;">
+		<h4 style="text-align: center;">Your email has been verified successfully.</h4>
+		<h5 style="text-align: center;">You may now <a href="{% url 'account:index' %}">Log In</a>.</h5>
 	</div>
-</div>
+
+{% load welcome_entry %}
+{% welcome_entry %}
 
 {% endblock %}
