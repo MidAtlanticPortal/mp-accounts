@@ -168,7 +168,7 @@ class ChangePasswordForm(DivForm):
 
 
 class SocialAccountConfirmForm(DivForm):
-    """A form that allows the user to enter some of their pertinant details
+    """A form that allows the user to enter some of their pertinent details
     before continuing to the site.
     """
     email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
@@ -177,6 +177,20 @@ class SocialAccountConfirmForm(DivForm):
                                 widget=l_icon('fa fa-user', 'Real Name'))
     preferred_name = forms.CharField(min_length=3, max_length=30,
                                      widget=l_icon('fa fa-user', 'Preferred Name'))
+
+    def clean(self):
+        """Raise a validation error if the email address provided is already in
+        use.
+        """
+        cleaned_data = super(SocialAccountConfirmForm, self).clean()
+        email = cleaned_data.get('email')
+
+        if get_user_model().objects.filter(email=email).exists():
+            msg = u"This email address is already in use, please select another"
+            self.add_error("email", msg)
+
+        return cleaned_data
+
 
 class UserDetailForm(SocialAccountConfirmForm):
     """A form for a user editing their info.
