@@ -317,7 +317,7 @@ def send_verification_email(request, e):
     url = request.build_absolute_uri(reverse('account:verify_email',
                                              args=(e.verification_code,)))
 
-    context = Context({'name': e.user.get_short_name(), 'url': url, 'host': 'http://midatlantic.point97.io'})
+    context = Context({'name': e.user.get_short_name(), 'url': url, 'host': 'http://portal.midatlanticocean.org'})
     template = get_template('accounts/mail/verify_email.txt')
     body_txt = template.render(context)
     template = get_template('accounts/mail/verify_email.html')
