@@ -1,14 +1,30 @@
 {% extends "base.html" %}
+{% load welcome_entry static %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/x-scss" href="{% static 'accounts/accounts.scss' %}" />
+{% endblock %}
 
 {% block content %}
-{% load welcome_entry %}
 {% welcome_entry %}
-<script>
-</script>
 
-<div style="border: 1px solid blue; margin: 1em 10em; padding: 3em">
+<div style="border: 1px solid #22408f; margin: 1em 10em; padding: 0 3em ">
     <h2 id="form-begin" style="text-align: center;">Sign Up</h2>
-    <p style="text-align: center">(All fields are required)</p>
+
+    <div class="login-form">
+        <div><h4>Sign up with your Facebook or Twitter account</h4></div>
+        <div class="social-login" style="text-align:center">
+            <a class="fa-stack fa-lg" href="{% url 'social:begin' 'twitter' %}?next={{ next }}">
+                <i class="fa fa-circle fa-stack-2x green"></i>
+                <i class="fa fa-twitter fa-stack-1x white"></i>
+            </a>
+
+            <a class="fa-stack fa-lg" href="{% url 'social:begin' 'facebook' %}?next={{ next }}">
+                <i class="fa fa-circle fa-stack-2x green"></i>
+                <i class="fa fa-facebook fa-stack-1x white"></i>
+            </a>
+        </div>
+    </div>
     <div>
         <form class="login-form" id="register-form" method="POST" action="{% url 'account:register' %}#form-begin">
             <style>
@@ -33,10 +49,14 @@
             </style>
             {% csrf_token %}
             
-            <hr />
+            <hr style="border-color: #b1b3b5" />
+            <div>
+                <h4>Or create a new account with a password</h4>
+            </div>
+
             {{ form.as_div }}
-            <hr />
-            
+            <hr style="border-color: #b1b3b5" />
+
             <div style="text-align: center;">
                 <button class='btn btn-success' onclick='this.form.submit()'>Sign up &rarr;</button>
             </div>
