@@ -57,7 +57,7 @@ def login_page(request):
             # to query the User models by email address to find a username,
             # and once we have that we can use the username to log in.
             try:
-                user = User.objects.get(email=email)
+                user = User.objects.get(email__iexact=email)
             except User.DoesNotExist:
                 form = LogInForm()
                 form.cleaned_data = {}
