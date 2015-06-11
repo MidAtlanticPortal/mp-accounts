@@ -62,6 +62,8 @@ def auth_user_get_short_name(self):
     return self.userdata.preferred_name
 User.get_short_name = auth_user_get_short_name
 
+# Make the user's email field unique
+# User._meta.get_field('email')._unique = True
 
 class PasswordDictionary(models.Model):
     """A collection of passwords that we don't accept. 
