@@ -4,6 +4,8 @@ from widgets import BSLeftIconTextInput, BSLeftIconPasswordInput,\
 from django.contrib.auth import get_user_model, authenticate
 from models import PasswordDictionary
 from django.core.exceptions import ValidationError
+from captcha.fields import ReCaptchaField
+
 
 def l_icon(icon_class, placeholder=None, attrs=None):
     """Shortcut for a left icon text input
@@ -63,6 +65,8 @@ class SignUpForm(DivForm):
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon_pw('fa fa-unlock-alt', 'password'),
                                validators=[password_dictionary_validator])
+
+    captcha = ReCaptchaField()
 
     def clean(self):
         """Raise a validation error if the username or email address provided

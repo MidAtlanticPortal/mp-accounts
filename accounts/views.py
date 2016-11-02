@@ -195,7 +195,7 @@ def register(request):
                 # login flow with a user that already exists
                 return render(request, 'accounts/registration_error.html')
 
-            user.is_active = False  # not validated yet
+            user.is_active = True
             user.set_password(password)
             user.email = email
             user.save()
@@ -205,9 +205,9 @@ def register(request):
             user.userdata.save()
 
             apply_user_permissions(user)
-            verify_email_address(request, user)
+            # verify_email_address(request, user)
             
-            return render(request, 'accounts/check_your_email.html')
+            return render(request, 'accounts/success.html')
     else:
         form = SignUpForm()
 
