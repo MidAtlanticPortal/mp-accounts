@@ -132,7 +132,7 @@ class UserDetailView(FormView):
             u.email = form.cleaned_data['email']
             u.userdata.email_verified = False
             u.emailverification_set.all().delete()
-            do_verification = True
+            # do_verification = True
 
         u.save()
         u.userdata.save()
