@@ -130,8 +130,8 @@ class UserDetailView(FormView):
         u.userdata.real_name = form.cleaned_data['real_name']
         if form.cleaned_data['email'].lower() != u.email:
             u.email = form.cleaned_data['email']
-            u.userdata.email_verified = False
-            u.emailverification_set.all().delete()
+            #u.userdata.email_verified = False
+            #u.emailverification_set.all().delete()
             # do_verification = True
 
         u.save()
