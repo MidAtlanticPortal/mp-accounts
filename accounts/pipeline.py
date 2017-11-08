@@ -28,7 +28,7 @@ def get_social_details(user, backend, response, details, strategy, *args, **kwar
         if id:
             user.userdata.profile_image = facebook_image_url.format(id=id)
 
-    elif backend.name == 'google-plus':
+    elif backend.name == 'google':
         url = response.get('image', {})
         url = url.get('url')
         if url:
@@ -61,9 +61,9 @@ def get_social_details(user, backend, response, details, strategy, *args, **kwar
     user.userdata.save()
 
 def set_user_permissions(strategy, details, user=None, *args, **kwargs):
-    """Configure any initial permissions/groups for the user. 
+    """Configure any initial permissions/groups for the user.
     """
-    
+
     apply_user_permissions(user)
 
 

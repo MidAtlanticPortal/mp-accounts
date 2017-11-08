@@ -42,7 +42,8 @@ def nice_provider_name(user):
         return 'Password'
 
     return {
-        'google-plus': "Google",
+        'google': "Google",
+        'google-oauth2': "Google",
         'facebook': "Facebook",
         'twitter': "Twitter",
     }[backend]
