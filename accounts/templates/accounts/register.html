@@ -14,18 +14,31 @@
     <h2 id="form-begin" style="text-align: center;">Sign Up</h2>
 
     <div class="login-form">
-        <div><h4>Sign up with your Facebook or Twitter account</h4></div>
+        {% if social %}
+        <div><h4>Sign up with an existing social media account</h4></div>
         <div class="social-login" style="text-align:center">
+            {% if twitter %}
             <a class="fa-stack fa-lg" href="{% url 'social:begin' 'twitter' %}?next={{ next }}">
                 <i class="fa fa-circle fa-stack-2x green"></i>
                 <i class="fa fa-twitter fa-stack-1x white"></i>
             </a>
+            {% endif %} <!-- twitter -->
 
+            {% if facebook %}
             <a class="fa-stack fa-lg" href="{% url 'social:begin' 'facebook' %}?next={{ next }}">
                 <i class="fa fa-circle fa-stack-2x green"></i>
                 <i class="fa fa-facebook fa-stack-1x white"></i>
             </a>
+            {% endif %} <!-- facebook -->
+
+            {% if google %}
+            <a class="fa-stack fa-lg" href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
+                <i class="fa fa-circle fa-stack-2x green"></i>
+                <i class="fa fa-google fa-stack-1x white"></i>
+            </a>
+            {% endif %} <!-- google -->
         </div>
+        {% endif %} <!-- social -->
     </div>
     <div>
         <form class="login-form" id="register-form" method="POST" action="{% url 'account:register' %}#form-begin">
@@ -35,7 +48,7 @@
             }
             .login-form > div {
                 width: 30em;
-                margin: 0 auto; 
+                margin: 0 auto;
             }
             .login-form div + div {
                 padding-top: 1ex;
@@ -45,15 +58,19 @@
             }
             .login-form .left-inner-addon { position: relative; }
             .login-form .left-inner-addon input { padding-left: 30px; }
-            .login-form .left-inner-addon i { 
+            .login-form .left-inner-addon i {
                 position: absolute; padding: 10px 12px; cursor: default;
             }
             </style>
             {% csrf_token %}
-            
+
             <hr style="border-color: #b1b3b5" />
             <div>
+                {% if social %}
                 <h4>Or create a new account with a password</h4>
+                {% else %}
+                <h4>Create a new account with a password</h4>
+                {% endif %} <!-- social -->
             </div>
 
             {{ form.as_div }}

@@ -218,8 +218,19 @@ def register(request):
     else:
         form = SignUpForm()
 
+    from marco.settings import SOCIAL_AUTH_GOOGLE_OAUTH2_KEY, SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET, SOCIAL_AUTH_FACEBOOK_KEY, SOCIAL_AUTH_FACEBOOK_SECRET, SOCIAL_AUTH_TWITTER_KEY, SOCIAL_AUTH_TWITTER_SECRET
+    google_enabled = SOCIAL_AUTH_GOOGLE_OAUTH2_KEY != 'You forgot to set the google key' and SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET != 'You forgot to set the google secret'
+    facebook_enabled = SOCIAL_AUTH_FACEBOOK_KEY != 'You forgot to set the facebook key' and SOCIAL_AUTH_FACEBOOK_SECRET != 'You forgot to set the facebook secret'
+    twitter_enabled = SOCIAL_AUTH_TWITTER_KEY != 'You forgot to set the twitter key' and SOCIAL_AUTH_TWITTER_SECRET != 'You forgot to set the twitter secret'
+    show_social_options = google_enabled or facebook_enabled or twitter_enabled
+
+
     c = {
         'form': form,
+        'google': google_enabled,
+        'facebook': facebook_enabled,
+        'twitter': twitter_enabled,
+        'social': show_social_options,
     }
     return render(request, 'accounts/register.html', c)
 
