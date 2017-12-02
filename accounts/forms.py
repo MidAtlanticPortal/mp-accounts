@@ -11,21 +11,21 @@ def l_icon(icon_class, placeholder=None, attrs=None):
     """Shortcut for a left icon text input
     """
     attrs = attrs or {}
-    if placeholder: 
+    if placeholder:
         attrs.update(placeholder=placeholder)
     return BSLeftIconTextInput(attrs, icon_class)
 
 
 def l_icon_pw(icon_class, placeholder=None, attrs=None):
     attrs = attrs or {}
-    if placeholder: 
+    if placeholder:
         attrs.update(placeholder=placeholder)
     return BSLeftIconPasswordInput(attrs, icon_class)
 
 
 def l_icon_email(icon_class, placeholder=None, attrs=None):
     attrs = attrs or {}
-    if placeholder: 
+    if placeholder:
         attrs.update(placeholder=placeholder)
     return BSLeftIconEmailInput(attrs, icon_class)
 
@@ -40,8 +40,8 @@ class DivForm(forms.Form):
     """A form that adds an 'as_div()' method which renders each form element
     inside <div></div> tags.
     """
-    
-    def as_div(self): 
+
+    def as_div(self):
         "Returns this form rendered as HTML <div>s."
         return self._html_output(
             normal_row='<div%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</div>',
@@ -50,7 +50,7 @@ class DivForm(forms.Form):
             help_text_html=' <span class="helptext">%s</span>',
             errors_on_separate_row=False)
 
-    
+
 class SignUpForm(DivForm):
     real_name = forms.CharField(min_length=3, max_length=100,
                                 widget=l_icon('fa fa-info', 'first and last name'), label="First and Last Name")
@@ -70,15 +70,15 @@ class SignUpForm(DivForm):
 
     def clean(self):
         """Raise a validation error if the username or email address provided
-        are already in use. 
+        are already in use.
         """
-        
+
         cleaned_data = super(SignUpForm, self).clean()
-        
+
         username = cleaned_data.get('username')
         email = cleaned_data.get('email')
-        
-        if get_user_model().objects.filter(username=username).exists(): 
+
+        if get_user_model().objects.filter(username=username).exists():
             msg = u"This user name is already in use, please select another."
             self.add_error("username", msg)
         if get_user_model().objects.filter(email=email).exists():
@@ -93,7 +93,7 @@ class LogInForm(DivForm):
                            widget=l_icon('fa fa-envelope-o', 'email'))
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon_pw('fa fa-unlock-alt', 'password'))
-    
+
 
 class ForgotPasswordForm(DivForm):
     email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
@@ -109,10 +109,10 @@ class ResetPasswordForm(DivForm):
                                 label="Confirm your password")
 
     def clean(self):
-        """Raise a validation error if the passwords do not match. 
+        """Raise a validation error if the passwords do not match.
         """
         cleaned_data = super(ResetPasswordForm, self).clean()
-        
+
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
 
@@ -198,6 +198,29 @@ class SocialAccountConfirmForm(DivForm):
 
 class UserDetailForm(SocialAccountConfirmForm):
     """A form for a user editing their info.
-    Currently identical to the Social account confirmation form.
+    Nearly identical to the Social account confirmation form.
     """
+
+    ### RDH: 12/01/2017
+    # We need to allow users to change data without changing their email
+    # We also need to make sure that users still can't steal other user's
+    # emails. For this we need to check both the submitted email and the
+    # request user's email. __init__ gets the user so that it can be used
+    # in clean below
+
+    def __init__(self, user, *args, **kwargs):
+        super(UserDetailForm, self).__init__( *args, **kwargs)
+        self.user = user
+
+    def clean(self):
+        cleaned_data = super(SocialAccountConfirmForm, self).clean()
+        email = cleaned_data.get('email')
+        user_email = self.user.email
+
+        if email.lower() != user_email.lower() and get_user_model().objects.filter(email=email).exists():
+            msg = u"This email address is already in use, please select another"
+            self.add_error("email", msg)
+
+        return cleaned_data
+
     pass
