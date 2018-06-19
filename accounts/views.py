@@ -106,6 +106,7 @@ def login_page(request):
     facebook_enabled = SOCIAL_AUTH_FACEBOOK_KEY != 'You forgot to set the facebook key' and SOCIAL_AUTH_FACEBOOK_SECRET != 'You forgot to set the facebook secret'
     twitter_enabled = SOCIAL_AUTH_TWITTER_KEY != 'You forgot to set the twitter key' and SOCIAL_AUTH_TWITTER_SECRET != 'You forgot to set the twitter secret'
     show_social_options = google_enabled or facebook_enabled or twitter_enabled
+    show_social_options = False
 
     c = dict(next=quote(next_page), form=form, google=google_enabled, facebook=facebook_enabled, twitter=twitter_enabled, social=show_social_options)
 
@@ -152,7 +153,7 @@ class UserDetailView(FormView):
     ### RDH: 12/01/2017
     # get_form_kwargs allows us to know the request's user when cleaning the
     # form. See forms.py for more.
-    
+
     def get_form_kwargs(self):
         kwargs = super(UserDetailView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
