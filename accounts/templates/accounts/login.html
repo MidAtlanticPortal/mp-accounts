@@ -46,6 +46,10 @@
                 </a>
                 {% endif %} <!-- google -->
             </div>
+
+            {% if google %}
+            <a href="{% url "social:begin" "google-oauth2" %}">Google+</a>
+            {% endif %} <!-- google -->
             {% else %}
               <div class="social" style="border: 2px solid #58585b; margin-top:1em; padding:1em">
                 <p>

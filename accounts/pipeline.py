@@ -19,6 +19,23 @@ def get_social_details(user, backend, response, details, strategy, *args, **kwar
 
     @type strategy social.strategies.django_strategy.DjangoStrategy
     """
+    # from django.contrib.auth.models import User
+    #
+    # if not user:
+    #     emails = []
+    #     for email_record in response['emails']:
+    #         emails.append(email_record['value'])
+    #     emails = list(set(emails))
+    #     user_candidates = User.objects.filter(email__in=emails)
+    #     if user_candidates.count() == 0:
+    #         user = User.objects.create(email=emails[0])
+    #     elif user_candidates.count() == 1:
+    #         user = user_candidates[0]
+    #     else:
+    #         # RDH Punt 09/12/2018
+    #         user = user_candidates[0]
+    #
+    # import ipdb; ipdb.set_trace()
 
     # Handle backend-specific data collection, such as profile picture
     if backend.name == 'facebook':
@@ -28,24 +45,24 @@ def get_social_details(user, backend, response, details, strategy, *args, **kwar
         if id:
             user.userdata.profile_image = facebook_image_url.format(id=id)
 
-    elif backend.name == 'google':
-        url = response.get('image', {})
-        url = url.get('url')
-        if url:
+    elif backend.name == 'google' or backend.name == 'google-oauth2':
+        url_record = response.get('image', {})
+        url_record = url_record.get('url')
+        if url_record:
             # The default URL provides an image of size 50, we want size 64
             # so swap out ?sz=50 with ?sz=64
-            url = urlparse.urlsplit(url)
+            url_record = urlparse.urlsplit(url_record)
             query = urllib.urlencode({'sz': '64'})
             # reassemble
-            url = (url.scheme, url.netloc, url.path, query, url.fragment)
-            url = urlparse.urlunsplit(url)
+            url_record = (url_record.scheme, url_record.netloc, url_record.path, query, url_record.fragment)
+            url_record = urlparse.urlunsplit(url_record)
 
-            user.userdata.profile_image = url
+            user.userdata.profile_image = url_record
 
     elif backend.name == 'twitter':
-        url = response.get('profile_image_url_https', '')
-        if url:
-            user.userdata.profile_image = url
+        url_record = response.get('profile_image_url_https', '')
+        if url_record:
+            user.userdata.profile_image = url_record
 
     # If this is a new account, set the user's real & preferred names.
     if strategy.session_get('new_account'):
