@@ -25,8 +25,14 @@ from nursery.view_helpers import decorate_view
 def index(request):
     """Serve up the primary account view, or the login view if not logged in
     """
-    if request.user.is_anonymous():
-        return login_page(request)
+    try:
+
+        if request.user.is_anonymous():
+            return login_page(request)
+    except AttributeError as e:
+        print(e)
+        import ipdb; ipdb.set_trace()
+        print(e)
 
     c = {}
 
@@ -106,7 +112,7 @@ def login_page(request):
     facebook_enabled = SOCIAL_AUTH_FACEBOOK_KEY != 'You forgot to set the facebook key' and SOCIAL_AUTH_FACEBOOK_SECRET != 'You forgot to set the facebook secret'
     twitter_enabled = SOCIAL_AUTH_TWITTER_KEY != 'You forgot to set the twitter key' and SOCIAL_AUTH_TWITTER_SECRET != 'You forgot to set the twitter secret'
     show_social_options = google_enabled or facebook_enabled or twitter_enabled
-    show_social_options = False
+    # show_social_options = False
 
     c = dict(next=quote(next_page), form=form, google=google_enabled, facebook=facebook_enabled, twitter=twitter_enabled, social=show_social_options)
 
@@ -257,8 +263,8 @@ def verify_new_email(request):
 
 def social_confirm(request):
     data = request.session.get('partial_pipeline')
-    if not data['backend']:
-        raise HttpResponseRedirect('/')
+    if not data or not 'backend' in data.keys():
+        return HttpResponseRedirect('/')
 
     if request.method == 'POST':
         form = SocialAccountConfirmForm(request.POST)
