@@ -60,7 +60,7 @@ class SignUpForm(DivForm):
 
     # hide_real_name = forms.BooleanField()
 
-    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
+    email = forms.EmailField(widget=l_icon('far fa-envelope', 'email address'))
 
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon_pw('fa fa-unlock-alt', 'password'),
@@ -90,13 +90,13 @@ class SignUpForm(DivForm):
 
 class LogInForm(DivForm):
     email = forms.CharField(min_length=4, max_length=100,
-                           widget=l_icon('fa fa-envelope-o', 'email'))
+                           widget=l_icon('far fa-envelope', 'email'))
     password = forms.CharField(min_length=6, max_length=100,
                                widget=l_icon_pw('fa fa-unlock-alt', 'password'))
 
 
 class ForgotPasswordForm(DivForm):
-    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
+    email = forms.EmailField(widget=l_icon('far fa-envelope', 'email address'))
 
 
 class ResetPasswordForm(DivForm):
@@ -175,7 +175,7 @@ class SocialAccountConfirmForm(DivForm):
     """A form that allows the user to enter some of their pertinent details
     before continuing to the site.
     """
-    email = forms.EmailField(widget=l_icon('fa fa-envelope-o', 'email address'))
+    email = forms.EmailField(widget=l_icon('far fa-envelope', 'email address'))
 
     real_name = forms.CharField(min_length=3, max_length=256,
                                 widget=l_icon('fa fa-user', 'Real Name'))
