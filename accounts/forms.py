@@ -1,8 +1,8 @@
 from django import forms
-from widgets import BSLeftIconTextInput, BSLeftIconPasswordInput,\
+from .widgets import BSLeftIconTextInput, BSLeftIconPasswordInput,\
     BSLeftIconEmailInput
 from django.contrib.auth import get_user_model, authenticate
-from models import PasswordDictionary
+from .models import PasswordDictionary
 from django.core.exceptions import ValidationError
 from captcha.fields import ReCaptchaField
 

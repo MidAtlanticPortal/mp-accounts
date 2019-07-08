@@ -28,7 +28,7 @@ class EmailVerification(models.Model):
 class UserData(models.Model):
     """Model to store additional user-related information.
     """
-    user = models.OneToOneField(User, primary_key=True)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     email_verified = models.BooleanField(default=False,
                                          help_text=("Has this user's email "
                                                     "been verified?"))

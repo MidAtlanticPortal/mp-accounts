@@ -13,8 +13,8 @@ from django.template.context import Context
 from django.contrib.auth.decorators import login_required, user_passes_test
 from urllib import quote
 
-from models import EmailVerification
-from forms import SignUpForm, ForgotPasswordForm,\
+from .models import EmailVerification
+from .forms import SignUpForm, ForgotPasswordForm,\
     ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm, \
     ChangePasswordForm
 from actions import apply_user_permissions, send_password_reset_email,\
