@@ -2,7 +2,7 @@ from django.utils.crypto import get_random_string
 import re
 from django.contrib.auth.models import Group
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template.context import Context
 from django.template.loader import get_template
 from models import EmailVerification
