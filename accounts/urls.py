@@ -6,7 +6,7 @@ from accounts.views import UserDetailView, ChangePasswordView
 from . import views
 from django.contrib import auth
 
-_urlpatterns = [
+urlpatterns = [
     re_path(r'^$', views.index, name='index'),
     re_path(r'^login/$', RedirectView.as_view(pattern_name='account:index'),
         name='login'),
@@ -29,7 +29,7 @@ _urlpatterns = [
 
 
 if settings.DEBUG:
-    _urlpatterns.extend([
+    urlpatterns.extend([
         re_path(r'^promote-user$', views.promote_user),
         re_path(r'^debug$', views.debug_page)
     ])
@@ -41,4 +41,4 @@ def urls(namespace='account'):
     The including module or project can refer to urls as namespace:urlname,
     internally, they are referred to as app_name:urlname.
     """
-    return (_urlpatterns, 'account', namespace)
+    return (urlpatterns, 'account', namespace)
