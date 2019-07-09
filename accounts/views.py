@@ -11,13 +11,13 @@ from django.urls import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required, user_passes_test
-from urllib import quote
+from urllib.parse import quote
 
 from .models import EmailVerification
 from .forms import SignUpForm, ForgotPasswordForm,\
     ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm, \
     ChangePasswordForm
-from actions import apply_user_permissions, send_password_reset_email,\
+from .actions import apply_user_permissions, send_password_reset_email,\
     send_social_auth_provider_login_email, generate_username
 from nursery.view_helpers import decorate_view
 
