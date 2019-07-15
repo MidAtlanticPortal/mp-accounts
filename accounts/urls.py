@@ -6,6 +6,8 @@ from accounts.views import UserDetailView, ChangePasswordView
 from . import views
 from django.contrib import auth
 
+app_name = 'account'
+
 urlpatterns = [
     re_path(r'^$', views.index, name='index'),
     re_path(r'^login/$', RedirectView.as_view(pattern_name='account:index'),

@@ -25,7 +25,7 @@ from nursery.view_helpers import decorate_view
 def index(request):
     """Serve up the primary account view, or the login view if not logged in
     """
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         return login_page(request)
 
     c = {}
