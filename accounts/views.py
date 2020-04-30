@@ -194,7 +194,7 @@ def register(request):
     """Show the registration page.
     """
 
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
     if request.method == 'POST':
@@ -388,7 +388,7 @@ def all_logged_in_users():
 def debug_page(request):
     """Serve up the primary account view, or the login view if not logged in
     """
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         return login_page(request)
 
     c = {}
@@ -405,7 +405,7 @@ def forgot(request):
     the email address isn't validated, do nothing (?)
     """
     # This doesn't make sense if the user is logged in
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
     if request.method == 'POST':
@@ -440,7 +440,7 @@ def forgot_reset(request, code):
     password.
     """
     # This doesn't make sense if the user is logged in
-    if not request.user.is_anonymous():
+    if not request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
     e = get_object_or_404(EmailVerification, verification_code=code)
