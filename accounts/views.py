@@ -7,7 +7,10 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
-from django.urls import reverse, reverse_lazy
+try:
+    from django.urls import reverse, reverse_lazy
+except ModuleNotFoundError as e:
+    from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context
 from django.contrib.auth.decorators import login_required, user_passes_test

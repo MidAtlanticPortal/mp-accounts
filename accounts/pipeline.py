@@ -1,7 +1,10 @@
 from social_core.exceptions import AuthException
 from django.contrib.auth.models import Group
 from django.http.response import HttpResponseRedirect
-from django.urls import reverse
+try:
+    from django.urls import reverse
+except ModuleNotFoundError as e:
+    from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.conf import settings
 from social_core.pipeline.partial import partial

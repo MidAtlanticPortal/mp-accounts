@@ -1,5 +1,7 @@
-# from django.conf.urls import url
-from django.urls import re_path, include
+try:
+    from django.urls import re_path, include
+except ModuleNotFoundError as e:
+    from django.conf.urls import url as re_path, include
 from django.conf import settings
 from django.views.generic import RedirectView
 from accounts.views import UserDetailView, ChangePasswordView
