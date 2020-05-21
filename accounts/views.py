@@ -9,7 +9,7 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 try:
     from django.urls import reverse, reverse_lazy
-except ModuleNotFoundError as e:
+except (ModuleNotFoundError, ImportError) as e:
     from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
 from django.template.context import Context

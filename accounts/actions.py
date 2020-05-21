@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.conf import settings
 try:
     from django.urls import reverse
-except ModuleNotFoundError as e:
+except (ModuleNotFoundError, ImportError) as e:
     from django.core.urlresolvers import reverse
 from django.template.context import Context
 from django.template.loader import get_template

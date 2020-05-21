@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 from django.http.response import HttpResponseRedirect
 try:
     from django.urls import reverse
-except ModuleNotFoundError as e:
+except (ModuleNotFoundError, ImportError) as e:
     from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.conf import settings
