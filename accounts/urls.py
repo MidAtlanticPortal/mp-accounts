@@ -14,7 +14,7 @@ urlpatterns = [
     re_path(r'^$', views.index, name='index'),
     re_path(r'^login/$', RedirectView.as_view(pattern_name='account:index'),
         name='login'),
-    re_path(r'^logout/$', auth.logout, {'next_page': '/'},
+    re_path(r'^logout/$', auth.views.LogoutView.as_view(next_page='/'),
         name='logout'),
     re_path(r'^register/$', views.register, name='register'),
     re_path(r'^edit/$', UserDetailView.as_view(), name='edit'),
