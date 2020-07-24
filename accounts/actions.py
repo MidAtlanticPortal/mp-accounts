@@ -14,7 +14,7 @@ def apply_user_permissions(user):
     """Configure any initial permissions/groups for the user.
     """
 
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         return
 
     g, created = Group.objects.get_or_create(name='Designers')
