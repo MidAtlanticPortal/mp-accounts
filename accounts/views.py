@@ -12,7 +12,6 @@ try:
 except (ModuleNotFoundError, ImportError) as e:
     from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
-from django.template.context import Context
 from django.contrib.auth.decorators import login_required, user_passes_test
 from urllib.parse import quote
 
@@ -348,11 +347,11 @@ def send_verification_email(request, e):
     url = request.build_absolute_uri(reverse('account:verify_email',
                                              args=(e.verification_code,)))
 
-    context = Context({'name': e.user.get_short_name(), 'url': url, 'host': 'http://portal.midatlanticocean.org'})
+    context = {'name': e.user.get_short_name(), 'url': url, 'host': 'http://portal.midatlanticocean.org'}
     template = get_template('accounts/mail/verify_email.txt')
-    body_txt = template.render(context)
+    body_txt = template.render(context,request)
     template = get_template('accounts/mail/verify_email.html')
-    body_html = template.render(context)
+    body_html = template.render(context,request)
     e.user.email_user('Please verify your email address', body_txt,
                       html_message=body_html, fail_silently=False)
 
