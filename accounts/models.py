@@ -59,7 +59,16 @@ User.get_full_name = auth_user_get_full_name
 def auth_user_get_short_name(self):
     """Returns the "Preferred name" from the UserData model.
     """
-    return self.userdata.preferred_name
+    short_name = self.userdata.preferred_name
+    if len(short_name)<3:
+        short_name = self.userdata.real_name
+    if len(short_name)<3:
+        short_name = self.first_name
+    if len(short_name)<3:
+        short_name = ' '.join([self.first_name, self.last_name])
+    if len(short_name)<3:
+        short_name = self.username
+    return short_name
 User.get_short_name = auth_user_get_short_name
 
 
