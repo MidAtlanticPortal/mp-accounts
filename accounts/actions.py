@@ -2,16 +2,18 @@ from django.utils.crypto import get_random_string
 import re
 from django.contrib.auth.models import Group
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.template.context import Context
+try:
+    from django.urls import reverse
+except (ModuleNotFoundError, ImportError) as e:
+    from django.core.urlresolvers import reverse
 from django.template.loader import get_template
-from models import EmailVerification
+from .models import EmailVerification
 
 def apply_user_permissions(user):
     """Configure any initial permissions/groups for the user.
     """
 
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         return
 
     g, created = Group.objects.get_or_create(name='Designers')
@@ -62,14 +64,14 @@ def send_password_reset_email(request, user):
     url = request.build_absolute_uri(reverse('account:forgot_reset',
                                              args=(e.verification_code,)))
 
-    context = Context({
+    context = {
         'name': user.get_short_name(),
         'url': url,
         'team_email': settings.DEFAULT_FROM_EMAIL,
-    })
+    }
 
     template = get_template('accounts/forgot/mail/password_reset.txt')
-    body_txt = template.render(context)
+    body_txt = template.render(context, request)
 
     # TODO: Make HTML template.
     body_html = body_txt
@@ -88,14 +90,14 @@ def send_social_auth_provider_login_email(request, user):
     # we don't have a name for the main page, so try a /
     url = request.build_absolute_uri('/')
 
-    context = Context({
+    context = {
         'name': user.get_short_name(),
         'auth_provider_name': nice_provider_name(user),
         'site_url': url,
-    })
+    }
 
     template = get_template('accounts/forgot/mail/you_are_using_a_social_account.txt')
-    body_txt = template.render(context)
+    body_txt = template.render(context,request)
     # TODO: Make HTML template.
     # TODO: Maybe store emails in Markdown, and then dynamically convert to
     # HTML. That way we don't have to store multiple messages.
