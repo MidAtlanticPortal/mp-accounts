@@ -7,27 +7,25 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.http.response import Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
-try:
-    from django.urls import reverse, reverse_lazy
-except (ModuleNotFoundError, ImportError) as e:
-    from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.template.loader import get_template
+from django.template.context import Context
 from django.contrib.auth.decorators import login_required, user_passes_test
-from urllib.parse import quote
+from urllib import quote
 
-from .models import EmailVerification
-from .forms import SignUpForm, ForgotPasswordForm,\
+from models import EmailVerification
+from forms import SignUpForm, ForgotPasswordForm,\
     ResetPasswordForm, SocialAccountConfirmForm, LogInForm, UserDetailForm, \
     ChangePasswordForm
-from .actions import apply_user_permissions, send_password_reset_email,\
+from actions import apply_user_permissions, send_password_reset_email,\
     send_social_auth_provider_login_email, generate_username
 from nursery.view_helpers import decorate_view
 
 
-def index(request, template_name='accounts/index.html'):
+def index(request):
     """Serve up the primary account view, or the login view if not logged in
     """
-    if request.user.is_anonymous:
+    if request.user.is_anonymous():
         return login_page(request)
 
     c = {}
@@ -38,7 +36,7 @@ def index(request, template_name='accounts/index.html'):
     else:
         c['can_change_password'] = True
 
-    return render(request, template_name, c)
+    return render(request, 'accounts/index.html', c)
 
 
 def login_page(request):
@@ -196,7 +194,7 @@ def register(request):
     """Show the registration page.
     """
 
-    if not request.user.is_anonymous:
+    if not request.user.is_anonymous():
         return HttpResponseRedirect('/')
 
     if request.method == 'POST':
@@ -347,11 +345,11 @@ def send_verification_email(request, e):
     url = request.build_absolute_uri(reverse('account:verify_email',
                                              args=(e.verification_code,)))
 
-    context = {'name': e.user.get_short_name(), 'url': url, 'host': 'http://portal.midatlanticocean.org'}
+    context = Context({'name': e.user.get_short_name(), 'url': url, 'host': 'http://portal.midatlanticocean.org'})
     template = get_template('accounts/mail/verify_email.txt')
-    body_txt = template.render(context,request)
+    body_txt = template.render(context)
     template = get_template('accounts/mail/verify_email.html')
-    body_html = template.render(context,request)
+    body_html = template.render(context)
     e.user.email_user('Please verify your email address', body_txt,
                       html_message=body_html, fail_silently=False)
 
@@ -390,7 +388,7 @@ def all_logged_in_users():
 def debug_page(request):
     """Serve up the primary account view, or the login view if not logged in
     """
-    if request.user.is_anonymous:
+    if request.user.is_anonymous():
         return login_page(request)
 
     c = {}
@@ -407,7 +405,7 @@ def forgot(request):
     the email address isn't validated, do nothing (?)
     """
     # This doesn't make sense if the user is logged in
-    if not request.user.is_anonymous:
+    if not request.user.is_anonymous():
         return HttpResponseRedirect('/')
 
     if request.method == 'POST':
@@ -442,7 +440,7 @@ def forgot_reset(request, code):
     password.
     """
     # This doesn't make sense if the user is logged in
-    if not request.user.is_anonymous:
+    if not request.user.is_anonymous():
         return HttpResponseRedirect('/')
 
     e = get_object_or_404(EmailVerification, verification_code=code)

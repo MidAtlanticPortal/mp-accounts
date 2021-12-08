@@ -5,14 +5,14 @@ import uuid
 from django.templatetags.static import static
 
 class EmailVerification(models.Model):
-    """Model to store email address verification data.
+    """Model to store email address verification data. 
     """
-    user = models.ForeignKey(User, unique=True, on_delete=models.CASCADE) # one verification at a time
+    user = models.ForeignKey(User, unique=True) # one verification at a time
     email_to_verify = models.EmailField()
     verification_code = models.CharField(max_length=32, editable=False)
-    # Expire verifications after XX days?
+    # Expire verifications after XX days? 
     created = models.DateTimeField(auto_now_add=True)
-    activate_user = models.BooleanField(default=True,
+    activate_user = models.BooleanField(default=True, 
         help_text=("If true, user.is_active will be set to true when verified."))
 
     def __str__(self):
@@ -26,11 +26,11 @@ class EmailVerification(models.Model):
 
 
 class UserData(models.Model):
-    """Model to store additional user-related information.
+    """Model to store additional user-related information. 
     """
-    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
-    email_verified = models.BooleanField(default=False,
-                                         help_text=("Has this user's email "
+    user = models.OneToOneField(User, primary_key=True)
+    email_verified = models.BooleanField(default=False, 
+                                         help_text=("Has this user's email " 
                                                     "been verified?"))
     profile_image = models.URLField(default=static('accounts/marco_user.png'),
                                     help_text=("URL to the user's profile image."))
@@ -59,21 +59,12 @@ User.get_full_name = auth_user_get_full_name
 def auth_user_get_short_name(self):
     """Returns the "Preferred name" from the UserData model.
     """
-    short_name = self.userdata.preferred_name
-    if len(short_name)<3:
-        short_name = self.userdata.real_name
-    if len(short_name)<3:
-        short_name = self.first_name
-    if len(short_name)<3:
-        short_name = ' '.join([self.first_name, self.last_name])
-    if len(short_name)<3:
-        short_name = self.username
-    return short_name
+    return self.userdata.preferred_name
 User.get_short_name = auth_user_get_short_name
 
 
 class PasswordDictionary(models.Model):
-    """A collection of passwords that we don't accept.
+    """A collection of passwords that we don't accept. 
     """
     password = models.CharField(max_length=128)
 
@@ -86,3 +77,4 @@ class PasswordDictionary(models.Model):
 
     def __str__(self):
         return self.password
+
